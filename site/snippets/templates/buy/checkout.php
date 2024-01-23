@@ -377,7 +377,7 @@ createApp({
 	countries: countries,
 	country: "DE",
 	get discount() {
-		if (this.quanitity >= 15) {
+		if (this.quantity >= 15) {
 			return 15;
 		}
 
