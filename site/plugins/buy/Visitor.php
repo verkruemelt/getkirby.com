@@ -46,6 +46,7 @@ class Visitor
 	protected function __construct(
 		public readonly string $currency,
 		public readonly float $rate,
+		public readonly float|null $vatRate = null,
 		public readonly string|null $country = null,
 		public readonly string|null $error = null
 	) {
@@ -56,12 +57,14 @@ class Visitor
 	 *
 	 * @param string $currency Currency code
 	 * @param float $rate Currency conversion rate from EUR
+	 * @param float|null $vatRate VAT rate for the country on top of the net price if available
 	 * @param string|null $country Two-character ISO country code if available
 	 * @param string|null $error Error message if an error occurred during currency detection
 	 */
 	public static function create(
 		string $currency,
 		float $rate,
+		float|null $vatRate = null,
 		string|null $country = null,
 		string|null $error = null
 	): static {
@@ -78,7 +81,7 @@ class Visitor
 			$error = 'Invalid conversion rate "' . $rate . '" for currency EUR';
 		}
 
-		return new static($currency, $rate, $country, $error);
+		return new static($currency, $rate, $vatRate, $country, $error);
 	}
 
 	/**
@@ -189,5 +192,14 @@ class Visitor
 		$converted = round($converted, -$digits + 2);
 
 		return '~ ' . $this->currencySign() . $converted . $suffix;
+	}
+
+	/**
+	 * Returns the VAT rate for the country on top
+	 * of the net price if available
+	 */
+	public function vatRate(): float
+	{
+		return $this->vatRate;
 	}
 }

@@ -62,9 +62,12 @@ return [
 				'basic-sale'            => $basic->price()->sale(),
 				'enterprise-regular'    => $enterprise->price()->regular(),
 				'enterprise-sale'       => $enterprise->price()->sale(),
+				'country'               => $visitor->country(),
+				'currency'              => $visitor->currency(),
 				'currency-sign'         => $visitor->currencySign(),
 				'currency-sign-trimmed' => rtrim($visitor->currencySign(), ' '),
 				'revenue-limit'         => $visitor->currency() !== 'EUR' ? ' (' . $visitor->revenueLimit(1000000) . ')' : '',
+				'vat-rate'              => $visitor->vatRate(),
 				'status'                => $visitor->error() ?? 'OK'
 			], JSON_UNESCAPED_UNICODE);
 		}

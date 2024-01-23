@@ -126,7 +126,10 @@ class Paddle
 
 				// calculate conversion rate from the EUR price;
 				// requires that the EUR price matches between the site and Paddle admin
-				rate: $paddleProduct['list_price']['net'] / $product->rawPrice()
+				rate: $paddleProduct['list_price']['net'] / $product->rawPrice(),
+
+				// calculate VAT rate, rounded to four decimal places to avoid float mishaps
+				vatRate: round($paddleProduct['list_price']['tax'] / $paddleProduct['list_price']['net'] * 10000) / 10000,
 			);
 		} catch (Throwable $e) {
 			// on any kind of error, use the EUR prices as a fallback
