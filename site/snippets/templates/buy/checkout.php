@@ -1,5 +1,5 @@
 <dialog v-scope class="checkout">
-	<form action="<?= url('buy/basic') ?>" method="POST">
+	<form action="<?= url('buy') ?>" method="POST">
 		<div class="field">
 			<label class="label" for="email">Email</label>
 			<input id="email" name="email" class="input" type="email" required v-model="email" placeholder="mail@example.com">

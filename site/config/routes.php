@@ -70,9 +70,12 @@ return [
 		}
 	],
 	[
-		'pattern' => 'buy/(enterprise|basic)',
-		'action' => function (string $product) {
-			$donate = get('donate') === 'true';
+		'pattern' => 'buy',
+		'method'  => 'POST',
+		'action' => function () {
+			// TODO: Use all dynamic form values
+			$donate  = get('donate') === 'true';
+			$product = 'basic';
 
 			try {
 				$product     = Product::from($product);
@@ -105,6 +108,45 @@ return [
 					'customer_email'    => 'mail@bastianallgeier.com',
 					'customer_country'  => 'DE',
 					'customer_postcode' => '68159',
+				]));
+			} catch (Throwable $e) {
+				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
+			}
+		},
+	],
+	[
+		'pattern' => 'buy/(enterprise|basic)',
+		'action' => function (string $product) {
+			$donate = get('donate') === 'true';
+
+			try {
+				$product     = Product::from($product);
+				$price       = $product->price();
+				$message     = $product->revenueLimit();
+				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount'));
+
+				$eurPrice       = $product->price('EUR')->sale();
+				$localizedPrice = $price->sale();
+
+				if ($donate === true) {
+					$customerDonation = option('buy.donation.customerAmount');
+					$eurPrice       += $customerDonation;
+					$localizedPrice += $price->convert($customerDonation);
+
+					$passthrough->customerDonation = $customerDonation;
+
+					$message .= ' We will donate an additional €' . $customerDonation . ' to ' . option('buy.donation.charity') . '. Thank you for your donation!';
+				}
+
+				$prices  = [
+					'EUR:' . $eurPrice,
+					$price->currency . ':' . $localizedPrice,
+				];
+
+				go($product->checkout('buy', [
+					'passthrough'    => $passthrough,
+					'custom_message' => $message,
+					'prices'         => $prices,
 				]));
 			} catch (Throwable $e) {
 				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
