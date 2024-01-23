@@ -99,9 +99,12 @@ return [
 				];
 
 				go($product->checkout('buy', [
-					'passthrough'    => $passthrough,
-					'custom_message' => $message,
-					'prices'         => $prices,
+					'passthrough'       => $passthrough,
+					'custom_message'    => $message,
+					'prices'            => $prices,
+					'customer_email'    => 'mail@bastianallgeier.com',
+					'customer_country'  => 'DE',
+					'customer_postcode' => '68159',
 				]));
 			} catch (Throwable $e) {
 				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');

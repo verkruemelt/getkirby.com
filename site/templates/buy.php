@@ -97,6 +97,7 @@ k-price-info:not(.loaded) {
 	gap: .5rem;
 	cursor: pointer;
 }
+
 </style>
 
 <article>
@@ -113,7 +114,7 @@ k-price-info:not(.loaded) {
 				</div>
 			<?php endif ?>
 
-			<?php if ($donation['customerAmount'] > 0): ?>
+			<!-- <?php if ($donation['customerAmount'] > 0): ?>
 				<h2 class="h3 sale mb-3">💗 &nbsp; Support a good cause</h2>
 
 				<div class="prose text-base max-w-xl mb-12">
@@ -127,7 +128,7 @@ k-price-info:not(.loaded) {
 						Donate an additional €<?= $donation['customerAmount'] ?> 💛
 					</label>
 				</div>
-			<?php endif ?>
+			<?php endif ?> -->
 		</div>
 
 		<div class="columns" style="--columns: 2; --gap: var(--spacing-6)">
@@ -327,13 +328,32 @@ k-price-info:not(.loaded) {
 
 </article>
 
+
+<?php snippet('templates/buy/checkout') ?>
 <script type="module">
+
 // close price details on clicks outside the details
 document.addEventListener("click", (event) => {
 	for (const details of [...document.querySelectorAll("details")]) {
 		if (details.contains(event.target) === false) {
 			details.removeAttribute("open");
 		}
+	}
+});
+
+const checkout = document.querySelector(".checkout");
+
+// open the dialog when a buy button is clicked
+for (const buyLink of [...document.querySelectorAll(".buy-link")]) {
+	buyLink.addEventListener("click", (e) => {
+		e.preventDefault();
+		checkout.showModal();
+	});
+}
+
+checkout.addEventListener("click", (event) => {
+	if (event.target === checkout) {
+		checkout.close();
 	}
 });
 
