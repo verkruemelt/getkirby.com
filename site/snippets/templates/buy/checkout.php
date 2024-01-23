@@ -114,7 +114,7 @@
 </dialog>
 
 <script type="module">
-document.querySelector(".checkout").showModal();
+// document.querySelector(".checkout").showModal();
 
 const prices = {
 	basic: 99,

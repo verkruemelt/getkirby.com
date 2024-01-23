@@ -357,20 +357,6 @@ checkout.addEventListener("click", (event) => {
 	}
 });
 
-// propagate customer donation checkbox to links and the volume form
-document.querySelector("[name='donate-checkbox']").addEventListener("change", (event) => {
-	let formValue = "", queryString = "";
-	if (event.target.checked === true) {
-		formValue   = "true";
-		queryString = "?donate=true";
-	}
-
-	document.querySelector("[name='donate']").value = formValue;
-	for (const buyLink of [...document.querySelectorAll(".buy-link")]) {
-		buyLink.search = queryString;
-	}
-});
-
 class PriceInfo extends HTMLElement {
 	constructor() {
 		super();
