@@ -113,22 +113,6 @@ k-price-info:not(.loaded) {
 					<?= $sale->text() ?>
 				</div>
 			<?php endif ?>
-
-			<!-- <?php if ($donation['customerAmount'] > 0): ?>
-				<h2 class="h3 sale mb-3">💗 &nbsp; Support a good cause</h2>
-
-				<div class="prose text-base max-w-xl mb-12">
-					<p class="mb-6">
-						For every license purchase we donate €<?= $donation['teamAmount'] ?> to
-						<a rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
-					</p>
-
-					<label class="p-3 bg-yellow-light color-black rounded block">
-						<input type="checkbox" name="donate-checkbox" class="mr-3">
-						Donate an additional €<?= $donation['customerAmount'] ?> 💛
-					</label>
-				</div>
-			<?php endif ?> -->
 		</div>
 
 		<div class="columns" style="--columns: 2; --gap: var(--spacing-6)">
