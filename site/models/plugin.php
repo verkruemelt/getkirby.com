@@ -239,6 +239,46 @@ class PluginPage extends Page
 		return $this->images()->findBy('name', 'screenshot') ?? $this->card();
 	}
 
+	public function stars(): Field
+	{
+		$cacheId = $this->infoCacheId('stars');
+		$stars   = $this->infoCache()->get($cacheId);
+
+		if ($stars === null) {
+
+			try {
+				$repo = $this->repository()->value();
+
+				if (empty($repo) === true || str_contains($repo ?? '', 'github')) {
+					throw new Exception('No valid repository');
+				}
+
+				$api = str_replace('https://github.com', 'https://api.github.com/repos', $repo);
+
+				$response = Remote::get($api, [
+					'headers' => [
+						'User-Agent' => 'Kirby Bot',
+						'Authorization' => 'Bearer ' . option('keys.github'),
+					]
+				]);
+
+				if ($response->code() !== 200) {
+					throw new Exception('Invalid response');
+				}
+
+				$json  = $response->json();
+				$stars = $json['stargazers_count'] ?? 0;
+
+			} catch (\Exception) {
+				$stars = 0;
+			}
+
+			$this->infoCache()->set($cacheId, $stars);
+		}
+
+		return parent::stars()->value($stars);
+	}
+
 	protected function tagPrefix(): string
 	{
 		$latestTag = $this->latestTag(true);

@@ -16,28 +16,11 @@ return [
 			$repo = $plugin->repository()->value();
 			$api  = str_replace('https://github.com', 'https://api.github.com/repos', $repo);
 
-			$response = Remote::get($api, [
-				'headers' => [
-					'User-Agent' => 'Kirby Bot',
-					'Authorization' => 'Bearer ' . option('keys.github'),
-				]
-			]);
+			// prime the cache
+			$stars = $plugin->stars();
 
 			$cli->success($api);
-
-			if ($response->code() !== 200) {
-				$cli->error($response->json());
-				continue;
-			}
-
-			$json  = $response->json();
-			$stars = $json['stargazers_count'] ?? 0;
-
-			$cli->dump($stars);
-
-			$plugin->update([
-				'stars' => $stars
-			]);
+			$cli->dump($stars->value());
 		}
 
 	}
