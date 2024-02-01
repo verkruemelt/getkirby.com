@@ -200,6 +200,6 @@ class Visitor
 	 */
 	public function vatRate(): float
 	{
-		return $this->vatRate;
+		return $this->vatRate ?? 0;
 	}
 }
