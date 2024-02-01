@@ -100,7 +100,7 @@ k-price-info:not(.loaded) {
 
 </style>
 
-<article>
+<article v-scope @mounted="mounted">
 	<div class="columns mb-42" style="--columns-sm: 1; --columns-md: 1; --columns-lg: 2; --gap: var(--spacing-6)">
 
 		<div>
@@ -129,9 +129,9 @@ k-price-info:not(.loaded) {
 						<?php endif ?>
 					</h2>
 
-					<a href="/buy/basic" target="_blank" class="buy-link h2 block mb-3">
-						<k-price-info key="currency-sign-trimmed" class="sale currency-sign">€</k-price-info><!--
-						--><k-price-info key="basic-sale" class="sale"><?= Buy\Product::Basic->price('EUR')->sale() ?></k-price-info>
+					<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="buy-link h2 block mb-3">
+						<span class="sale currency-sign">{{ currencySignTrimmed }}</span><!--
+						--><span class="sale">{{ prices.basic }}</span>
 						per site
 					</a>
 
@@ -150,7 +150,7 @@ k-price-info:not(.loaded) {
 
 				<footer>
 					<p>
-						<a href="/buy/basic" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
+						<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
 							<?= icon('cart') ?>
 							Buy Basic
 						</a>
@@ -171,9 +171,9 @@ k-price-info:not(.loaded) {
 						<?php endif ?>
 					</h2>
 
-					<a href="/buy/enterprise" target="_blank" class="buy-link h2 block mb-3">
-						<k-price-info key="currency-sign-trimmed" class="sale currency-sign">€</k-price-info><!--
-						--><k-price-info key="enterprise-sale" class="sale"><?= Buy\Product::Enterprise->price('EUR')->sale() ?></k-price-info>
+					<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="buy-link h2 block mb-3">
+						<span class="sale currency-sign">{{ currencySignTrimmed }}</span><!--
+						--><span class="sale">{{ prices.enterprise }}</span>
 						per site
 					</a>
 
@@ -191,7 +191,7 @@ k-price-info:not(.loaded) {
 
 				<footer>
 					<p>
-						<a href="/buy/enterprise" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
+						<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
 							<?= icon('cart') ?>
 							Buy Enterprise
 						</a>
@@ -210,17 +210,17 @@ k-price-info:not(.loaded) {
 				<fieldset>
 					<legend class="sr-only">License Type</legend>
 					<div class="volume-toggles">
-						<label><input type="radio" name="product" value="basic" checked> Basic</label>
-						<label><input type="radio" name="product" value="enterprise"> Enterprise</label>
+						<label><input type="radio" name="product" value="basic" v-model="license" checked> Basic</label>
+						<label><input type="radio" name="product" value="enterprise" v-model="license"> Enterprise</label>
 					</div>
 				</fieldset>
 			</header>
-			<div class="columns rounded overflow-hidden" style="--columns-md: 2; --columns: 4; --gap: var(--spacing-3)">
+			<div class="columns rounded overflow-hidden" style="--columns-md: 3; --columns: 3; --gap: var(--spacing-3)">
 				<?php foreach ($discounts as $volume => $discount) : ?>
 					<div class="block p-12 bg-light rounded text-center" >
 						<article>
 							<h3 class="mb text-sm">
-								<?= $volume ?> licenses
+								<?= $volume ?>+ licenses
 							</h3>
 							<div class="mb-6">
 								<p class="h2">
@@ -231,31 +231,12 @@ k-price-info:not(.loaded) {
 								<?php endif ?>
 							</div>
 
-							<button class="btn btn--filled mb-3" name="volume" value="<?= $volume ?>">
+							<button class="btn btn--filled mb-3" @click.prevent="openCheckout(license, <?= $volume ?>)" name="volume" value="<?= $volume ?>">
 								<?= icon('cart') ?> Buy now
 							</button>
 						</article>
 					</div>
 				<?php endforeach ?>
-				<a class="block p-12 bg-light text-center" href="mailto:support@getkirby.com">
-					<article>
-						<h3 class="text-sm">Custom packages</h3>
-
-						<div class="mb-6">
-							<p class="h2">
-								Contact us
-							</p>
-							<?php if ($sale->isActive()): ?>
-								<p class="sale">&nbsp;</p>
-							<?php endif ?>
-						</div>
-
-						<p class="btn btn--outlined">
-							<?= icon('user') ?>
-							Support
-						</p>
-					</article>
-				</a>
 			</div>
 		</form>
 	</section>
@@ -310,11 +291,16 @@ k-price-info:not(.loaded) {
 		Manage your existing licenses in our <a href="https://hub.getkirby.com"><span class="link">license&nbsp;hub</span> &rarr;</a>
 	</footer>
 
+	<?php snippet('templates/buy/checkout') ?>
+
 </article>
 
-
-<?php snippet('templates/buy/checkout') ?>
 <script type="module">
+import {
+	createApp,
+	reactive
+} from '<?= url('assets/js/libraries/petite-vue.js') ?>';
+
 
 // close price details on clicks outside the details
 document.addEventListener("click", (event) => {
@@ -327,26 +313,12 @@ document.addEventListener("click", (event) => {
 
 const checkout = document.querySelector(".checkout");
 
-// open the dialog when a buy button is clicked
-for (const buyLink of [...document.querySelectorAll(".buy-link")]) {
-	buyLink.addEventListener("click", (e) => {
-		e.preventDefault();
-		checkout.showModal();
-	});
-}
-
-checkout.addEventListener("click", (event) => {
-	if (event.target === checkout) {
-		checkout.close();
-	}
-});
-
 class PriceInfo extends HTMLElement {
 	constructor() {
 		super();
 
 		this.key = this.getAttribute("key");
-		this.value = window.priceInfo[this.key];
+		this.value = 0; // window.priceInfo[this.key] ?? 0;
 
 		// format price values
 		if (Number.isFinite(this.value) === true) {
@@ -361,13 +333,353 @@ class PriceInfo extends HTMLElement {
 	}
 }
 
-// fetch with options that allow using the preloaded response
-const response = await fetch("<?= url('buy/prices') ?>", {
-	method: "GET",
-	credentials: "include",
-	mode: "no-cors",
-});
-window.priceInfo = await response.json();
+const countries = {
+  "Aland Islands": "AX",
+  "Albania": "AL",
+  "Algeria": "DZ",
+  "American Samoa": "AS",
+  "Andorra": "AD",
+  "Angola": "AO",
+  "Anguilla": "AI",
+  "Antigua and Barbuda": "AG",
+  "Argentina": "AR",
+  "Armenia": "AM",
+  "Aruba": "AW",
+  "Australia": "AU",
+  "Austria": "AT",
+  "Azerbaijan": "AZ",
+  "Bahamas": "BS",
+  "Bahrain": "BH",
+  "Bangladesh": "BD",
+  "Barbados": "BB",
+  "Belgium": "BE",
+  "Belize": "BZ",
+  "Benin": "BJ",
+  "Bermuda": "BM",
+  "Bhutan": "BT",
+  "Bolivia": "BO",
+  "Bonaire, Sint Eustatius and Saba": "BQ",
+  "Bosnia and Herzegovina": "BA",
+  "Botswana": "BW",
+  "Bouvet Island": "BV",
+  "Brazil": "BR",
+  "Brit. Indian Ocean": "IO",
+  "British Virgin Islands": "VG",
+  "Brunei": "BN",
+  "Bulgaria": "BG",
+  "Burkina Faso": "BF",
+  "Burundi": "BI",
+  "Cambodia": "KH",
+  "Cameroon": "CM",
+  "Canada": "CA",
+  "Cape Verde": "CV",
+  "Cayman Islands": "KY",
+  "Chad": "TD",
+  "Chile": "CL",
+  "China": "CN",
+  "Christmas Island": "CX",
+  "Cocos Islands": "CC",
+  "Colombia": "CO",
+  "Comoros": "KM",
+  "Cook Islands": "CK",
+  "Costa Rica": "CR",
+  "Cote D’Ivoire": "CI",
+  "Croatia": "HR",
+  "Curaçao": "CW",
+  "Cyprus": "CY",
+  "Czech Republic": "CZ",
+  "Denmark": "DK",
+  "Djibouti": "DJ",
+  "Dominica": "DM",
+  "Dominican Republic": "DO",
+  "Ecuador": "EC",
+  "Egypt": "EG",
+  "El Salvador": "SV",
+  "Equatorial Guinea": "GQ",
+  "Eritrea": "ER",
+  "Estonia": "EE",
+  "Ethiopia": "ET",
+  "Falkland Islands": "FK",
+  "Faroe Islands": "FO",
+  "Fiji": "FJ",
+  "Finland": "FI",
+  "France": "FR",
+  "French Guiana": "GF",
+  "French Polynesia": "PF",
+  "French Southern Terr.": "TF",
+  "Gabon": "GA",
+  "Gambia": "GM",
+  "Georgia": "GE",
+  "Germany": "DE",
+  "Ghana": "GH",
+  "Gibraltar": "GI",
+  "Greece": "GR",
+  "Greenland": "GL",
+  "Grenada": "GD",
+  "Guadeloupe": "GP",
+  "Guam": "GU",
+  "Guatemala": "GT",
+  "Guernsey": "GG",
+  "Guinea": "GN",
+  "Guinea-Bissau": "GW",
+  "Guyana": "GY",
+  "Heard/ Mcdonald Islands": "HM",
+  "Holy See/ Vatican City": "VA",
+  "Honduras": "HN",
+  "Hong Kong": "HK",
+  "Hungary": "HU",
+  "Iceland": "IS",
+  "India": "IN",
+  "Indonesia": "ID",
+  "Iraq": "IQ",
+  "Ireland": "IE",
+  "Isle of Man": "IM",
+  "Israel": "IL",
+  "Italy": "IT",
+  "Jamaica": "JM",
+  "Japan": "JP",
+  "Jersey": "JE",
+  "Jordan": "JO",
+  "Kazakhstan": "KZ",
+  "Kenya": "KE",
+  "Kiribati": "KI",
+  "Kosovo": "XK",
+  "Kuwait": "KW",
+  "Kyrgyzstan": "KG",
+  "Lao People’s DR": "LA",
+  "Latvia": "LV",
+  "Lebanon": "LB",
+  "Lesotho": "LS",
+  "Liberia": "LR",
+  "Liechtenstein": "LI",
+  "Lithuania": "LT",
+  "Luxembourg": "LU",
+  "Macao": "MO",
+  "Macedonia": "MK",
+  "Madagascar": "MG",
+  "Malawi": "MW",
+  "Malaysia": "MY",
+  "Maldives": "MV",
+  "Malta": "MT",
+  "Marshall Islands": "MH",
+  "Martinique": "MQ",
+  "Mauritania": "MR",
+  "Mauritius": "MU",
+  "Mayotte": "YT",
+  "Mexico": "MX",
+  "Micronesia": "FM",
+  "Moldova": "MD",
+  "Monaco": "MC",
+  "Mongolia": "MN",
+  "Montenegro": "ME",
+  "Montserrat": "MS",
+  "Morocco": "MA",
+  "Mozambique": "MZ",
+  "Namibia": "NA",
+  "Nauru": "NR",
+  "Nepal": "NP",
+  "Netherlands": "NL",
+  "Netherlands Antilles": "AN",
+  "New Caledonia": "NC",
+  "New Zealand": "NZ",
+  "Niger": "NE",
+  "Nigeria": "NG",
+  "Niue": "NU",
+  "Norfolk Island": "NF",
+  "Northern Mariana Islands": "MP",
+  "Norway": "NO",
+  "Oman": "OM",
+  "Pakistan": "PK",
+  "Palau": "PW",
+  "Palestinian Territory": "PS",
+  "Panama": "PA",
+  "Papua New Guinea": "PG",
+  "Paraguay": "PY",
+  "Peru": "PE",
+  "Philippines": "PH",
+  "Pitcairn": "PN",
+  "Poland": "PL",
+  "Portugal": "PT",
+  "Puerto Rico": "PR",
+  "Qatar": "QA",
+  "Republic of Congo": "CG",
+  "Republic of Serbia": "RS",
+  "Reunion": "RE",
+  "Romania": "RO",
+  "Rwanda": "RW",
+  "S. Georgia/ Sandwich Islands": "GS",
+  "Saint Helena": "SH",
+  "Saint Kitts and Nevis": "KN",
+  "Saint Lucia": "LC",
+  "Saint Martin": "MF",
+  "Saint Pierre and Miquelon": "PM",
+  "Saint Vincent/ Grenadines": "VC",
+  "Samoa": "WS",
+  "San Marino": "SM",
+  "Sao Tome and Principe": "ST",
+  "Saudi Arabia": "SA",
+  "Senegal": "SN",
+  "Seychelles": "SC",
+  "Sierra Leone": "SL",
+  "Singapore": "SG",
+  "Slovakia": "SK",
+  "Slovenia": "SI",
+  "Solomon Islands": "SB",
+  "South Africa": "ZA",
+  "South Korea": "KR",
+  "Spain": "ES",
+  "Sri Lanka": "LK",
+  "Sudan": "SD",
+  "Suriname": "SR",
+  "Svalbard and Jan Mayen": "SJ",
+  "Swaziland": "SZ",
+  "Sweden": "SE",
+  "Switzerland": "CH",
+  "Taiwan": "TW",
+  "Tajikistan": "TJ",
+  "Tanzania": "TZ",
+  "Thailand": "TH",
+  "Timor-Leste": "TL",
+  "Togo": "TG",
+  "Tokelau": "TK",
+  "Tonga": "TO",
+  "Trinidad and Tobago": "TT",
+  "Tunisia": "TN",
+  "Turkey": "TR",
+  "Turkmenistan": "TM",
+  "Turks and Caicos Islands": "TC",
+  "Tuvalu": "TV",
+  "U.S. Virgin Islands": "VI",
+  "Uganda": "UG",
+  "Ukraine": "UA",
+  "United Arab Emirates": "AE",
+  "United Kingdom": "GB",
+  "United States": "US",
+  "United States (M.O.I.)": "UM",
+  "Uruguay": "UY",
+  "Uzbekistan": "UZ",
+  "Vanuatu": "VU",
+  "Vietnam": "VN",
+  "Wallis and Futuna": "WF",
+  "Western Sahara": "EH",
+  "Zambia": "ZM"
+};
 
-customElements.define("k-price-info", PriceInfo);
+const zips = [
+	"AU",
+	"CA",
+	"FR",
+	"DE",
+	"IN",
+	"IT",
+	"NL",
+	"ES",
+	"GB",
+	"US"
+];
+
+createApp({
+	amount(amount) {
+		// format price values
+		if (Number.isFinite(amount) === true) {
+			const formatter = new Intl.NumberFormat("en", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2,
+			});
+			return this.currencySignTrimmed + formatter.format(amount);
+		}
+	},
+	city: "",
+	closeCheckout(event) {
+		if (event.target === checkout) {
+			checkout.close();
+		}
+	},
+	company: "",
+	countries: countries,
+	country: "DE",
+	currencySign: "€",
+	currencySignTrimmed: "€",
+	get discountRate() {
+		if (this.quantity >= 15) {
+			return 15;
+		}
+
+		if (this.quantity >= 10) {
+			return 10;
+		}
+
+		if (this.quantity >= 5) {
+			return 5;
+		}
+
+		return 0;
+	},
+	get discountAmount() {
+		const factor = (100 - this.discountRate) / 100;
+		return (this.netLicenseAmount - (this.netLicenseAmount * factor)) * -1;
+	},
+	donation: true,
+	get donationAmount() {
+		return this.donation ? 1 : 0;
+	},
+	email: "",
+	license: "basic",
+	async mounted() {
+
+		// fetch with options that allow using the preloaded response
+		const response = await fetch("/buy/prices", {
+			method: "GET",
+			credentials: "include",
+			mode: "no-cors",
+		});
+
+		const data = await response.json();
+
+		this.currencySign        = data["currency-sign"];
+		this.currencySignTrimmed = data["currency-sign-trimmed"];
+		this.country             = data["country"];
+		this.prices.basic        = data["basic-regular"];
+		this.prices.enterprise   = data["enterprise-regular"];
+		this.vatRate             = data["vat-rate"];
+	},
+	get needsZip() {
+		return zips.includes(this.country);
+	},
+	newsletter: false,
+	get netLicenseAmount() {
+		return this.price * this.quantity;
+	},
+	get netAmount() {
+		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
+	},
+	openCheckout(license, quantity = 1) {
+		this.license = license;
+		this.quantity = quantity;
+		checkout.showModal();
+	},
+	get price() {
+		return this.prices[this.license];
+	},
+	prices: {
+		basic: 99,
+		enterprise: 349
+	},
+	quantity: 1,
+	state: "",
+	street: "",
+	get totalAmount() {
+		return this.netAmount + this.vatAmount;
+	},
+	get vatAmount() {
+		const rate = this.vatIdExists ? 0 : this.vatRate;
+		return (this.netAmount / 100) * rate;
+	},
+	vatRate: 0,
+	vatId: "",
+	get vatIdExists() {
+		return Boolean(this.vatId?.length);
+	},
+	zip: "",
+}).mount();
 </script>
