@@ -9,7 +9,7 @@
 							<div class="inputs">
 								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
 								<select required name="license" v-model="license">
-									<option value="basic">Kirby Basic</option>
+									<option value="basic" selected>Kirby Basic</option>
 									<option value="enterprise">Kirby Enterprise</option>
 								</select>
 							</div>
@@ -57,19 +57,19 @@
 		</div>
 		<div class="checkout-form">
 			<div class="field">
-				<label class="label" for="email">Email</label>
+				<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
 				<input id="email" name="email" class="input" type="email" required v-model="email" placeholder="mail@example.com">
 			</div>
 			<div class="field">
-				<label class="label" for="country">Country</label>
-				<select id="country" name="country" autocomplete="country" class="input" v-model="country">
+				<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
+				<select id="country" name="country" required autocomplete="country" class="input" v-model="country">
 					<?php foreach ($countries as $countryCode => $countryName): ?>
 					<option value="<?= $countryCode ?>"><?= $countryName ?></option>
 					<?php endforeach ?>
 				</select>
 			</div>
 			<div v-if="needsZip" class="field">
-				<label class="label" for="zip">Postal Code</label>
+				<label class="label" for="zip">Postal Code <abbr title="Required">*</abbr></label>
 				<input id="zip" name="postalCode" class="input" autocomplete="postal-code" :required="needsZip" v-model="zip" type="text">
 			</div>
 			<div class="field">
@@ -81,22 +81,22 @@
 			<fieldset v-if="vatIdExists">
 
 				<div class="field">
-					<label class="label" for="company">Company Name</label>
+					<label class="label" for="company">Company Name <abbr title="Required">*</abbr></label>
 					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="company" :required="vatIdExists">
 				</div>
 
 				<div class="field">
-					<label class="label" for="street">Street</label>
+					<label class="label" for="street">Street <abbr title="Required">*</abbr></label>
 					<input id="street" name="street" class="input" type="text" v-model="street" :required="vatIdExists">
 				</div>
 
 				<div class="field">
-					<label class="label" for="city">Town/City</label>
+					<label class="label" for="city">Town/City <abbr title="Required">*</abbr></label>
 					<input id="city" name="city" class="input" type="text" v-model="city" :required="vatIdExists">
 				</div>
 
 				<div class="field">
-					<label class="label" for="state">State/County</label>
+					<label class="label" for="state">State/County <abbr title="Required">*</abbr></label>
 					<input id="state" name="state" class="input" type="text" v-model="state" :required="vatIdExists">
 				</div>
 			</fieldset>
@@ -110,8 +110,7 @@
 			</div>
 
 			<div class="buttons">
-				<button formmethod="dialog" formnovalidate type="submit" class="btn btn--filled"><?= icon('cancel') ?> Cancel</button>
-				<button class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
+				<button type="submit" class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
 			</div>
 		</div>
 	</form>
@@ -159,6 +158,17 @@ body:has(.checkout[open]) {
 	font-weight: var(--font-bold);
 	margin-bottom: var(--spacing-2);
 }
+.checkout .label abbr {
+	text-decoration: none;
+	color: var(--color-red-500);
+	margin-left: .125rem;
+	display: none;
+}
+
+.field:has(*:invalid) .label abbr {
+	display: inline;
+}
+
 .checkout .input {
 	height: 2.25rem;
 	background: var(--color-white);

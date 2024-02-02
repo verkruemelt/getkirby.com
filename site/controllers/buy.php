@@ -242,10 +242,12 @@ return function (Page $page) {
 	];
 
 	return [
-		'countries' => $countries,
-		'discounts' => option('buy.volume'),
-		'donation'  => option('buy.donation'),
-		'sale'      => $sale,
-		'questions' => $page->find('answers')->children()
+		'basic'      => Buy\Product::Basic,
+		'countries'  => $countries,
+		'discounts'  => option('buy.volume'),
+		'donation'   => option('buy.donation'),
+		'enterprise' => Buy\Product::Enterprise,
+		'sale'       => $sale,
+		'questions'  => $page->find('answers')->children()
 	];
 };

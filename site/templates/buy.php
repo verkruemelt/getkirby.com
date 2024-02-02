@@ -66,18 +66,24 @@
 	color: var(--color-yellow-500);
 }
 
-.sale {
-	color: var(--color-purple-600);
+.price {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.125rem;
 }
-.strikethrough {
+.price[data-regular] {
+	color: var(--color-gray-700);
 	text-decoration: line-through;
 }
-.currency-sign {
-	font-size: var(--text-xl);
-	padding-right: 0.25em;
+.price[data-sale] {
+	color: var(--color-purple-600);
 }
-k-price-info:not(.loaded) {
-	color: var(--color-gray-600);
+.price[data-sale] .currency-sign {
+	font-size: var(--text-xl);
+}
+
+[data-loading] .price[data-sale] {
+	color: var(--color-gray-600)
 }
 
 @media (max-width: 40rem) {
@@ -100,7 +106,7 @@ k-price-info:not(.loaded) {
 
 </style>
 
-<article v-scope @mounted="mounted">
+<article v-scope data-loading @mounted="mounted">
 	<div class="columns mb-42" style="--columns-sm: 1; --columns-md: 1; --columns-lg: 2; --gap: var(--spacing-6)">
 
 		<div>
@@ -119,19 +125,21 @@ k-price-info:not(.loaded) {
 			<div class="pricing p-6 bg-white shadow-xl rounded flex flex-column justify-between">
 				<header>
 					<h2>
-						Basic
+						<?= $basic->label() ?>
 
 						<?php if ($sale->isActive()): ?>
-						<span class="px-1 color-gray-700 strikethrough">
-							<k-price-info key="currency-sign">€</k-price-info><!--
-							--><k-price-info key="basic-regular"><?= Buy\Product::Basic->price('EUR')->regular() ?></k-price-info>
+						<span class="price px-1" data-regular>
+							<span v-text="currencySign">€</span>
+							<span class="amount" v-text="amountDisplay(prices.basic.regular)"><?= $basic->price('EUR')->regular() ?></span>
 						</span>
 						<?php endif ?>
 					</h2>
 
-					<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="buy-link h2 block mb-3">
-						<span class="sale currency-sign">{{ currencySignTrimmed }}</span><!--
-						--><span class="sale">{{ prices.basic }}</span>
+					<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="h2 block mb-3">
+						<span class="price" data-sale>
+							<span class="currency-sign" v-text="currencySignTrimmed">€</span>
+							<span class="amount" v-text="amountDisplay(prices.basic.sale)"><?= $basic->price('EUR')->sale() ?></span>
+						</span>
 						per site
 					</a>
 
@@ -141,7 +149,7 @@ k-price-info:not(.loaded) {
 				<details class="revenue">
 					<summary><span>Revenue limit: <strong>€1M / year</strong></span> <?= icon('info') ?></summary>
 					<div>
-						<p>Your revenue or funding is less than <strong>€1&nbsp;million<k-price-info key="revenue-limit"></k-price-info></strong> in the <strong>last 12 months</strong>.</p>
+						<p>Your revenue or funding is less than <strong>€1&nbsp;million<span v-if="revenueLimit.length" v-text="revenueLimit"></span></strong> in the <strong>last 12 months</strong>.</p>
 						<p>If you build a website for a client, the limit has to fit the revenue of your client.</p>
 					</div>
 				</details>
@@ -150,9 +158,9 @@ k-price-info:not(.loaded) {
 
 				<footer>
 					<p>
-						<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
+						<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="btn btn--filled mb-1 w-100%">
 							<?= icon('cart') ?>
-							Buy Basic
+							Buy <?= $basic->label() ?>
 						</a>
 					</p>
 				</footer>
@@ -161,19 +169,21 @@ k-price-info:not(.loaded) {
 			<div class="pricing p-6 bg-white shadow-xl rounded flex flex-column justify-between">
 				<header>
 					<h2>
-						Enterprise
+						<?= $enterprise->label() ?>
 
 						<?php if ($sale->isActive()): ?>
-						<span class="px-1 color-gray-700 strikethrough">
-							<k-price-info key="currency-sign">€</k-price-info><!--
-							--><k-price-info key="enterprise-regular"><?= Buy\Product::Enterprise->price('EUR')->regular() ?></k-price-info>
+						<span class="price px-1" data-regular>
+							<span v-text="currencySign">€</span>
+							<span class="amount" v-text="amountDisplay(prices.enterprise.regular)"><?= $enterprise->price('EUR')->regular() ?></span>
 						</span>
 						<?php endif ?>
 					</h2>
 
-					<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="buy-link h2 block mb-3">
-						<span class="sale currency-sign">{{ currencySignTrimmed }}</span><!--
-						--><span class="sale">{{ prices.enterprise }}</span>
+					<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="h2 block mb-3">
+						<span class="price" data-sale>
+							<span class="currency-sign" v-text="currencySignTrimmed">€</span>
+							<span class="amount" v-text="amountDisplay(prices.enterprise.sale)"><?= $enterprise->price('EUR')->sale() ?></span>
+						</span>
 						per site
 					</a>
 
@@ -191,9 +201,9 @@ k-price-info:not(.loaded) {
 
 				<footer>
 					<p>
-						<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="buy-link btn btn--filled mb-1 w-100%">
+						<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="btn btn--filled mb-1 w-100%">
 							<?= icon('cart') ?>
-							Buy Enterprise
+							Buy <?= $enterprise->label() ?>
 						</a>
 					</p>
 				</footer>
@@ -210,8 +220,8 @@ k-price-info:not(.loaded) {
 				<fieldset>
 					<legend class="sr-only">License Type</legend>
 					<div class="volume-toggles">
-						<label><input type="radio" name="product" value="basic" v-model="license" checked> Basic</label>
-						<label><input type="radio" name="product" value="enterprise" v-model="license"> Enterprise</label>
+						<label><input type="radio" name="product" value="<?= $basic->value() ?>" v-model="license" checked> <?= $basic->label() ?></label>
+						<label><input type="radio" name="product" value="<?= $enterprise->value() ?>" v-model="license"> <?= $enterprise->value() ?></label>
 					</div>
 				</fieldset>
 			</header>
@@ -301,7 +311,6 @@ import {
 	reactive
 } from '<?= url('assets/js/libraries/petite-vue.js') ?>';
 
-
 // close price details on clicks outside the details
 document.addEventListener("click", (event) => {
 	for (const details of [...document.querySelectorAll("details")]) {
@@ -312,27 +321,6 @@ document.addEventListener("click", (event) => {
 });
 
 const checkout = document.querySelector(".checkout");
-
-class PriceInfo extends HTMLElement {
-	constructor() {
-		super();
-
-		this.key = this.getAttribute("key");
-		this.value = 0; // window.priceInfo[this.key] ?? 0;
-
-		// format price values
-		if (Number.isFinite(this.value) === true) {
-			const formatter = new Intl.NumberFormat("en");
-			this.value = formatter.format(this.value);
-		}
-	}
-
-	connectedCallback() {
-		this.textContent = this.value;
-		this.classList.add("loaded");
-	}
-}
-
 
 const zips = [
 	"AU",
@@ -349,13 +337,18 @@ const zips = [
 
 createApp({
 	amount(amount) {
-		// format price values
 		if (Number.isFinite(amount) === true) {
 			const formatter = new Intl.NumberFormat("en", {
 				minimumFractionDigits: 2,
 				maximumFractionDigits: 2,
 			});
 			return this.currencySignTrimmed + formatter.format(amount);
+		}
+	},
+	amountDisplay(amount) {
+		if (Number.isFinite(amount) === true) {
+			const formatter = new Intl.NumberFormat("en");
+			return formatter.format(amount);
 		}
 	},
 	city: "",
@@ -407,9 +400,16 @@ createApp({
 		this.currencySign        = data["currency-sign"];
 		this.currencySignTrimmed = data["currency-sign-trimmed"];
 		this.country             = data["country"];
-		this.prices.basic        = data["basic-regular"];
-		this.prices.enterprise   = data["enterprise-regular"];
+		this.revenueLimit        = data["revenue-limit"];
 		this.vatRate             = data["vat-rate"];
+
+		// prices
+		this.prices.basic.regular      = data["basic-regular"];
+		this.prices.basic.sale         = data["basic-sale"];
+		this.prices.enterprise.regular = data["enterprise-regular"];
+		this.prices.enterprise.sale    = data["enterprise-sale"];
+
+		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
 	get needsZip() {
 		return zips.includes(this.country);
@@ -427,13 +427,20 @@ createApp({
 		checkout.showModal();
 	},
 	get price() {
-		return this.prices[this.license];
+		return this.prices[this.license].sale;
 	},
 	prices: {
-		basic: 99,
-		enterprise: 349
+		basic: {
+			regular: 99,
+			sale: 99,
+		},
+		enterprise: {
+			regular: 349,
+			sale: 349,
+		}
 	},
 	quantity: 1,
+	revenueLimit: "",
 	state: "",
 	street: "",
 	get totalAmount() {

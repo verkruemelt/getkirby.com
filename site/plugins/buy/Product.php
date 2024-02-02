@@ -25,6 +25,18 @@ enum Product: string
 	}
 
 	/**
+	 * Returns the human-readable label for the buy page
+	 */
+	public function label(): string
+	{
+		return match ($this) {
+			static::Basic      => 'Basic',
+			static::Enterprise => 'Enterprise',
+			default            => null
+		};
+	}
+
+	/**
 	 * Returns the price object for the product
 	 */
 	public function price(string|null $currency = null, float|null $rate = null): Price
@@ -71,4 +83,10 @@ enum Product: string
 			default   => option('buy.' . $this->value . '.upgrade')
 		};
 	}
+
+	public function value(): string
+	{
+		return $this->value;
+	}
+
 }
