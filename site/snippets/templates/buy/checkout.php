@@ -1,119 +1,122 @@
 <dialog class="checkout" @click="closeCheckout">
 	<form action="<?= url('buy') ?>" method="POST">
-		<div class="field">
-			<label class="label" for="email">Email</label>
-			<input id="email" name="email" class="input" type="email" required v-model="email" placeholder="mail@example.com">
-		</div>
-		<div class="field">
-			<label class="label" for="country">Country</label>
-			<select id="country" name="country" class="input" v-model="country">
-				<option v-for="(code, name) in countries" :value="code">{{ name }}</option>
-			</select>
-		</div>
-		<div v-if="needsZip" class="field">
-			<label class="label" for="zip">Postal Code</label>
-			<input id="zip" class="input" :required="needsZip" v-model="zip" type="text">
-		</div>
-		<div class="field">
-			<label class="label" for="vatid">VAT ID</label>
-			<input id="vatid" name="vatId" class="input" type="text" v-model="vatId">
-			<p v-if="vatIdExists" class="color-gray-700 text-xs pt-1">Your VAT ID will be validated on checkout</p>
-		</div>
-
-		<fieldset v-if="vatIdExists">
-
-			<div class="field">
-				<label class="label" for="company">Company Name</label>
-				<input id="company" name="company" class="input" type="text" v-model="company" :required="vatIdExists">
+		<div class="checkout-preview">
+			<div>
+				<label class="label">Your order</label>
+				<table>
+					<tr>
+						<th>
+							<div class="inputs">
+								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
+								<select required v-model="license">
+									<option value="basic">Kirby Basic</option>
+									<option value="enterprise">Kirby Enterprise</option>
+								</select>
+							</div>
+						</th>
+						<td>{{ amount(netLicenseAmount) }}</td>
+					</tr>
+					<tr v-if="discountRate">
+						<th>
+							Volume Discount (-{{ discountRate }}%)
+						</th>
+						<td>{{ amount(discountAmount) }}</td>
+					</tr>
+					<tr v-if="donation">
+						<th>
+							Your donation
+						</th>
+						<td>€1.00</td>
+					</tr>
+					<tr>
+						<th>
+							VAT ({{ vatRate }}%)
+						</th>
+						<td>{{ amount(vatAmount) }}</td>
+					</tr>
+					<tr>
+						<th>
+							Total
+						</th>
+						<td>{{ amount(totalAmount) }}</td>
+					</tr>
+				</table>
 			</div>
 
 			<div class="field">
-				<label class="label" for="street">Street</label>
-				<input id="street" name="street" class="input" type="text" v-model="street" :required="vatIdExists">
+				<label for="donate-checkbox" class="label">Support a good cause</label>
+				<p class="mb-3">
+					For every license purchase we donate €<?= $donation['teamAmount'] ?> to
+					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
+				</p>
+				<label class="checkbox">
+					<input id="donate-checkbox" type="checkbox" name="donate" v-model="donation">
+					Donate an additional €<?= $donation['customerAmount'] ?> 💛
+				</label>
 			</div>
-
-			<div class="field">
-				<label class="label" for="city">Town/City</label>
-				<input id="city" name="city" class="input" type="text" v-model="city" :required="vatIdExists">
-			</div>
-
-			<div class="field">
-				<label class="label" for="state">State/County</label>
-				<input id="state" name="state" class="input" type="text" v-model="state" :required="vatIdExists">
-			</div>
-		</fieldset>
-
-		<div class="field">
-			<label class="label" for="newsletter">Newsletter</label>
-			<label class="checkbox">
-				<input id="newsletter" type="checkbox" name="newsletter" v-model="newsletter">
-				Subscribe to our newsletter
-			</label>
 		</div>
+		<div class="checkout-form">
+			<div class="field">
+				<label class="label" for="email">Email</label>
+				<input id="email" name="email" class="input" type="email" required v-model="email" placeholder="mail@example.com">
+			</div>
+			<div class="field">
+				<label class="label" for="country">Country</label>
+				<select id="country" name="country" class="input" v-model="country">
+					<option v-for="(code, name) in countries" :value="code">{{ name }}</option>
+				</select>
+			</div>
+			<div v-if="needsZip" class="field">
+				<label class="label" for="zip">Postal Code</label>
+				<input id="zip" class="input" :required="needsZip" v-model="zip" type="text">
+			</div>
+			<div class="field">
+				<label class="label" for="vatid">VAT ID</label>
+				<input id="vatid" name="vatId" class="input" type="text" v-model="vatId">
+				<p v-if="vatIdExists" class="color-gray-700 text-xs pt-1">Your VAT ID will be validated on checkout</p>
+			</div>
 
-		<div class="buttons">
-			<button formmethod="dialog" formnovalidate type="submit" class="btn btn--filled"><?= icon('cancel') ?> Cancel</button>
-			<button class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
+			<fieldset v-if="vatIdExists">
+
+				<div class="field">
+					<label class="label" for="company">Company Name</label>
+					<input id="company" name="company" class="input" type="text" v-model="company" :required="vatIdExists">
+				</div>
+
+				<div class="field">
+					<label class="label" for="street">Street</label>
+					<input id="street" name="street" class="input" type="text" v-model="street" :required="vatIdExists">
+				</div>
+
+				<div class="field">
+					<label class="label" for="city">Town/City</label>
+					<input id="city" name="city" class="input" type="text" v-model="city" :required="vatIdExists">
+				</div>
+
+				<div class="field">
+					<label class="label" for="state">State/County</label>
+					<input id="state" name="state" class="input" type="text" v-model="state" :required="vatIdExists">
+				</div>
+			</fieldset>
+
+			<div class="field">
+				<label class="label" for="newsletter">Newsletter</label>
+				<label class="checkbox">
+					<input id="newsletter" type="checkbox" name="newsletter" v-model="newsletter">
+					Subscribe to our newsletter
+				</label>
+			</div>
+
+			<div class="buttons">
+				<button formmethod="dialog" formnovalidate type="submit" class="btn btn--filled"><?= icon('cancel') ?> Cancel</button>
+				<button class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
+			</div>
 		</div>
 	</form>
-	<div class="checkout-preview">
-		<div>
-			<label class="label">Your order</label>
-			<table>
-				<tr>
-					<th>
-						<div class="inputs">
-							<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
-							<select required v-model="license">
-								<option value="basic">Kirby Basic</option>
-								<option value="enterprise">Kirby Enterprise</option>
-							</select>
-						</div>
-					</th>
-					<td>{{ amount(netLicenseAmount) }}</td>
-				</tr>
-				<tr v-if="discountRate">
-					<th>
-						Volume Discount (-{{ discountRate }}%)
-					</th>
-					<td>{{ amount(discountAmount) }}</td>
-				</tr>
-				<tr v-if="donation">
-					<th>
-						Your donation
-					</th>
-					<td>€1.00</td>
-				</tr>
-				<tr>
-					<th>
-						VAT ({{ vatRate }}%)
-					</th>
-					<td>{{ amount(vatAmount) }}</td>
-				</tr>
-				<tr>
-					<th>
-						Total
-					</th>
-					<td>{{ amount(totalAmount) }}</td>
-				</tr>
-			</table>
-		</div>
-
-		<div class="field">
-			<label for="donate-checkbox" class="label">Support a good cause</label>
-			<p class="mb-3">
-				For every license purchase we donate €<?= $donation['teamAmount'] ?> to
-				<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
-			</p>
-			<label class="checkbox">
-				<input id="donate-checkbox" type="checkbox" name="donate" v-model="donation">
-				Donate an additional €<?= $donation['customerAmount'] ?> 💛
-			</label>
-		</div>
-	</div>
 </dialog>
 
 <style>
+
 .checkout[open] {
 	font-size: var(--text-sm);
 	margin: auto;
@@ -121,18 +124,28 @@
 	width: 50rem;
 	box-shadow: var(--shadow-2xl);
 	border-radius: var(--rounded);
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-areas: "preview form";
 }
 .checkout::backdrop {
 	background: rgba(0,0,0, .7);
 }
+
+body:has(.checkout[open]) {
+	overflow: hidden;
+}
+
+@media screen and (min-width: 40rem) {
+	.checkout form {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-areas: "preview form";
+	}
+}
+
 .checkout-preview {
 	grid-area: preview;
 	background: var(--color-white);
 }
-.checkout form {
+.checkout-form {
 	grid-area: form;
 	padding: var(--spacing-8);
 }
@@ -164,6 +177,7 @@
 	border-radius: var(--rounded-sm);
 	box-shadow: 0px 0px 0px 1px var(--color-border);
 	gap: var(--spacing-3);
+	cursor: pointer;
 }
 
 .checkout fieldset {
