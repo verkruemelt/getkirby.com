@@ -8,9 +8,9 @@
 						<th>
 							<div class="inputs">
 								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
-								<select required name="license" v-model="license">
-									<option value="basic" selected>Kirby Basic</option>
-									<option value="enterprise">Kirby Enterprise</option>
+								<select required name="license" v-model="license" value="<?= $basic->value() ?>">
+									<option value="<?= $basic->value() ?>" selected>Kirby <?= $basic->label() ?></option>
+									<option value="<?= $enterprise->value() ?>">Kirby <?= $enterprise->label() ?></option>
 								</select>
 							</div>
 						</th>
