@@ -1,5 +1,5 @@
 <dialog class="checkout" @click="closeCheckout">
-	<form action="<?= url('buy') ?>" method="POST">
+	<form action="<?= url('buy') ?>" method="POST" target="_blank">
 		<div class="checkout-preview">
 			<div>
 				<label class="label">Your order</label>
@@ -8,7 +8,7 @@
 						<th>
 							<div class="inputs">
 								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
-								<select required v-model="license">
+								<select required name="license" v-model="license">
 									<option value="basic">Kirby Basic</option>
 									<option value="enterprise">Kirby Enterprise</option>
 								</select>
@@ -44,13 +44,13 @@
 			</div>
 
 			<div class="field">
-				<label for="donate-checkbox" class="label">Support a good cause</label>
+				<label for="donate" class="label">Support a good cause</label>
 				<p class="mb-3">
 					For every license purchase we donate €<?= $donation['teamAmount'] ?> to
 					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 				</p>
 				<label class="checkbox">
-					<input id="donate-checkbox" type="checkbox" name="donate" v-model="donation">
+					<input id="donate" type="checkbox" name="donate" v-model="donation">
 					Donate an additional €<?= $donation['customerAmount'] ?> 💛
 				</label>
 			</div>
@@ -62,17 +62,19 @@
 			</div>
 			<div class="field">
 				<label class="label" for="country">Country</label>
-				<select id="country" name="country" class="input" v-model="country">
-					<option v-for="(code, name) in countries" :value="code">{{ name }}</option>
+				<select id="country" name="country" autocomplete="country" class="input" v-model="country">
+					<?php foreach ($countries as $countryCode => $countryName): ?>
+					<option value="<?= $countryCode ?>"><?= $countryName ?></option>
+					<?php endforeach ?>
 				</select>
 			</div>
 			<div v-if="needsZip" class="field">
 				<label class="label" for="zip">Postal Code</label>
-				<input id="zip" class="input" :required="needsZip" v-model="zip" type="text">
+				<input id="zip" name="postalCode" class="input" autocomplete="postal-code" :required="needsZip" v-model="zip" type="text">
 			</div>
 			<div class="field">
-				<label class="label" for="vatid">VAT ID</label>
-				<input id="vatid" name="vatId" class="input" type="text" v-model="vatId">
+				<label class="label" for="vatId">VAT ID</label>
+				<input id="vatId" name="vatId" class="input" type="text" v-model="vatId">
 				<p v-if="vatIdExists" class="color-gray-700 text-xs pt-1">Your VAT ID will be validated on checkout</p>
 			</div>
 
@@ -80,7 +82,7 @@
 
 				<div class="field">
 					<label class="label" for="company">Company Name</label>
-					<input id="company" name="company" class="input" type="text" v-model="company" :required="vatIdExists">
+					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="company" :required="vatIdExists">
 				</div>
 
 				<div class="field">

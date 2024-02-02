@@ -76,95 +76,21 @@ return [
 		'method'  => 'POST',
 		'action' => function () {
 			// TODO: Use all dynamic form values
-			$donate  = get('donate') === 'true';
-			$product = 'basic';
+			$city       = get('city');
+			$company    = get('company');
+			$country    = get('country');
+			$donate     = get('donate') === 'on';
+			$email      = get('email');
+			$license    = get('license');
+			$newsletter = get('newsletter') === 'on';
+			$postalCode = get('postalCode');
+			$state      = get('state');
+			$street     = get('street');
+			$quantity   = get('quantity', 1);
+			$vatId      = get('vatId');
 
 			try {
-				$product     = Product::from($product);
-				$price       = $product->price();
-				$message     = $product->revenueLimit();
-				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount'));
-
-				$eurPrice       = $product->price('EUR')->sale();
-				$localizedPrice = $price->sale();
-
-				if ($donate === true) {
-					$customerDonation = option('buy.donation.customerAmount');
-					$eurPrice       += $customerDonation;
-					$localizedPrice += $price->convert($customerDonation);
-
-					$passthrough->customerDonation = $customerDonation;
-
-					$message .= ' We will donate an additional €' . $customerDonation . ' to ' . option('buy.donation.charity') . '. Thank you for your donation!';
-				}
-
-				$prices  = [
-					'EUR:' . $eurPrice,
-					$price->currency . ':' . $localizedPrice,
-				];
-
-				go($product->checkout('buy', [
-					'passthrough'       => $passthrough,
-					'custom_message'    => $message,
-					'prices'            => $prices,
-					'customer_email'    => 'mail@bastianallgeier.com',
-					'customer_country'  => 'DE',
-					'customer_postcode' => '68159',
-				]));
-			} catch (Throwable $e) {
-				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
-			}
-		},
-	],
-	[
-		'pattern' => 'buy/(enterprise|basic)',
-		'action' => function (string $product) {
-			$donate = get('donate') === 'true';
-
-			try {
-				$product     = Product::from($product);
-				$price       = $product->price();
-				$message     = $product->revenueLimit();
-				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount'));
-
-				$eurPrice       = $product->price('EUR')->sale();
-				$localizedPrice = $price->sale();
-
-				if ($donate === true) {
-					$customerDonation = option('buy.donation.customerAmount');
-					$eurPrice       += $customerDonation;
-					$localizedPrice += $price->convert($customerDonation);
-
-					$passthrough->customerDonation = $customerDonation;
-
-					$message .= ' We will donate an additional €' . $customerDonation . ' to ' . option('buy.donation.charity') . '. Thank you for your donation!';
-				}
-
-				$prices  = [
-					'EUR:' . $eurPrice,
-					$price->currency . ':' . $localizedPrice,
-				];
-
-				go($product->checkout('buy', [
-					'passthrough'    => $passthrough,
-					'custom_message' => $message,
-					'prices'         => $prices,
-				]));
-			} catch (Throwable $e) {
-				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
-			}
-		},
-	],
-	[
-		'pattern' => 'buy/volume',
-		'method'  => 'POST',
-		'action'  => function () {
-			$product  = get('product', 'basic');
-			$quantity = get('volume', 5);
-			$donate   = get('donate') === 'true';
-
-			try {
-				$product     = Product::from($product);
+				$product     = Product::from($license);
 				$price       = $product->price();
 				$message     = $product->revenueLimit();
 				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount') * $quantity);
@@ -189,32 +115,27 @@ return [
 				];
 
 				go($product->checkout('buy', [
-					'passthrough'    => $passthrough,
-					'custom_message' => $message,
-					'prices'         => $prices,
-					'quantity'       => $quantity,
+					'custom_message'    => $message,
+					'customer_country'  => $country,
+					'customer_email'    => $email,
+					'customer_postcode' => $postalCode,
+					'marketing_consent' => $newsletter ? 1 : 0,
+					'passthrough'       => $passthrough,
+					'prices'            => $prices,
+					'quantity'          => $quantity,
+					'quantity_variable' => 0,
+					'vat_city'          => $city,
+					'vat_country'       => $country,
+					'vat_company_name'  => $company,
+					'vat_number'        => $vatId,
+					'vat_postcode'      => $postalCode,
+					'vat_state'         => $state,
+					'vat_street'        => $street,
 				]));
 			} catch (Throwable $e) {
 				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
 			}
-		}
-	],
-	[
-		'pattern' => 'buy/volume/(enterprise|basic)/(:num)',
-		'action'  => function (string $product, int $quantity) {
-			try {
-				$product = Product::from($product);
-				$price   = $product->price();
-				$prices  = [
-					'EUR:' . $product->price('EUR')->volume($quantity),
-					$price->currency . ':' . $price->volume($quantity),
-				];
-
-				go($product->checkout('buy', compact('prices', 'quantity')));
-			} catch (Throwable $e) {
-				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
-			}
-		}
+		},
 	],
 	[
 		'pattern' => 'pixels',
