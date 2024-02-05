@@ -1,5 +1,5 @@
-<dialog class="checkout" @click="closeCheckout">
-	<form action="<?= url('buy') ?>" method="POST" target="_blank">
+<dialog class="dialog checkout" @click="closeCheckout">
+	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank">
 		<div class="checkout-preview">
 			<div>
 				<label class="label">Your order</label>
@@ -117,22 +117,7 @@
 </dialog>
 
 <style>
-
-.checkout[open] {
-	font-size: var(--text-sm);
-	margin: auto;
-	background: var(--color-light);
-	width: 50rem;
-	box-shadow: var(--shadow-2xl);
-	border-radius: var(--rounded);
-}
-.checkout::backdrop {
-	background: rgba(0,0,0, .7);
-}
-
-body:has(.checkout[open]) {
-	overflow: hidden;
-}
+@import url("/assets/css/site/dialog.css");
 
 @media screen and (min-width: 40rem) {
 	.checkout form {
@@ -146,50 +131,10 @@ body:has(.checkout[open]) {
 	grid-area: preview;
 	background: var(--color-white);
 }
+
 .checkout-form {
 	grid-area: form;
 	padding: var(--spacing-8);
-}
-.checkout .field + .field {
-	margin-top: var(--spacing-6);
-}
-.checkout .label {
-	display: block;
-	font-weight: var(--font-bold);
-	margin-bottom: var(--spacing-2);
-}
-.checkout .label abbr {
-	text-decoration: none;
-	color: var(--color-red-500);
-	margin-left: .125rem;
-	display: none;
-}
-
-.field:has(*:invalid) .label abbr {
-	display: inline;
-}
-
-.checkout .input {
-	height: 2.25rem;
-	background: var(--color-white);
-	padding: var(--spacing-2);
-	border-radius: var(--rounded-sm);
-	box-shadow: 0px 0px 0px 1px var(--color-border);
-}
-.checkout select.input {
-	appearance: none;
-}
-.checkout .checkbox {
-	height: 2.25rem;
-	display: flex;
-	align-items: center;
-	color: var(--color-black);
-	padding: var(--spacing-2) var(--spacing-3);
-	background: var(--color-white);
-	border-radius: var(--rounded-sm);
-	box-shadow: 0px 0px 0px 1px var(--color-border);
-	gap: var(--spacing-3);
-	cursor: pointer;
 }
 
 .checkout fieldset {
