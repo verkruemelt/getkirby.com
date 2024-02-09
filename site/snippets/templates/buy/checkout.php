@@ -26,7 +26,7 @@
 						<th>
 							Your donation
 						</th>
-						<td>€1.00</td>
+						<td>{{ amount(donationAmount) }}</td>
 					</tr>
 					<tr>
 						<th>

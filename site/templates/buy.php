@@ -382,7 +382,7 @@ createApp({
 	},
 	donation: true,
 	get donationAmount() {
-		return this.donation ? 1 : 0;
+		return this.donation ? (1 * this.quantity) : 0;
 	},
 	email: "",
 	license: "basic",
