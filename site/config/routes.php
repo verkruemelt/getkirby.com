@@ -99,11 +99,13 @@ return [
 				$localizedPrice = $price->volume($quantity);
 
 				if ($donate === true) {
-					// only a single donation for the purchase, not for each license
+					// prices per license
 					$customerDonation = option('buy.donation.customerAmount');
-					$eurPrice       += $customerDonation / $quantity;
-					$localizedPrice += $price->convert($customerDonation) / $quantity;
+					$eurPrice       += $customerDonation;
+					$localizedPrice += $price->convert($customerDonation);
 
+					// donation overall
+					$customerDonation *= $quantity;
 					$passthrough->customerDonation = $customerDonation;
 
 					$message .= ' We will donate an additional €' . $customerDonation . ' to ' . option('buy.donation.charity') . '. Thank you for your donation!';

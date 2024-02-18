@@ -51,7 +51,7 @@
 				</p>
 				<label class="checkbox">
 					<input id="donate" type="checkbox" name="donate" v-model="donation">
-					Donate an additional €<?= $donation['customerAmount'] ?> 💛
+					Donate an additional €<?= $donation['customerAmount'] ?> per license 💛
 				</label>
 			</div>
 		</div>
