@@ -398,7 +398,7 @@ createApp({
 		this.currencySignTrimmed = data["currency-sign-trimmed"];
 		this.country             = data["country"];
 		this.revenueLimit        = data["revenue-limit"];
-		this.vatRate             = data["vat-rate"] || 0;
+		this.vatRate             = (data["vat-rate"] || 0) * 100;
 
 		// prices
 		this.prices.basic.regular      = data["basic-regular"];
