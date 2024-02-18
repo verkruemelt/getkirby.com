@@ -31,6 +31,10 @@ class Passthrough
 	 */
 	public static function fromJson(string $json): static
 	{
+		if ($json === '') {
+			return new static();
+		}
+
 		if (Str::startsWith($json, '{') === false) {
 			// just a license string
 			return new static(license: $json);
