@@ -415,9 +415,6 @@ createApp({
 	get netLicenseAmount() {
 		return this.price * this.quantity;
 	},
-	get netAmount() {
-		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
-	},
 	openCheckout(product, quantity = 1) {
 		this.product = product;
 		this.quantity = quantity;
@@ -440,12 +437,15 @@ createApp({
 	revenueLimit: "",
 	state: "",
 	street: "",
+	get subtotal() {
+		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
+	},
 	get totalAmount() {
-		return this.netAmount + this.vatAmount;
+		return this.subtotal + this.vatAmount;
 	},
 	get vatAmount() {
 		const rate = this.vatIdExists ? 0 : this.vatRate;
-		return (this.netAmount / 100) * rate;
+		return this.subtotal * rate / 100;
 	},
 	vatRate: 0,
 	vatId: "",

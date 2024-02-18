@@ -28,13 +28,19 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
+					<tr class="total" v-if="vatRate > 0">
+						<th>
+							Subtotal
+						</th>
+						<td>{{ amount(subtotal) }}</td>
+					</tr>
 					<tr v-if="vatRate > 0">
 						<th>
 							VAT ({{ vatIdExists ? 0 : vatRate }}%)
 						</th>
 						<td>{{ amount(vatAmount) }}</td>
 					</tr>
-					<tr>
+					<tr class="total">
 						<th>
 							Total
 						</th>
@@ -179,7 +185,7 @@
 .checkout-preview td {
 	text-align: right;
 }
-.checkout-preview tr:last-child * {
+.checkout-preview tr.total * {
 	border-top-width: 2px;
 	font-weight: var(--font-bold);
 }
