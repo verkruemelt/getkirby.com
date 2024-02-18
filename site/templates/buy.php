@@ -379,8 +379,11 @@ createApp({
 		return this.netLicenseAmount * factor * -1;
 	},
 	donation: false,
+	get donationText() {
+		return "Donate an additional " + this.currencySign + this.prices.donation.customer + " per license 💛";
+	},
 	get donationAmount() {
-		return this.donation ? (1 * this.quantity) : 0;
+		return this.donation ? (this.prices.donation.customer * this.quantity) : 0;
 	},
 	email: "",
 	product: "basic",
@@ -403,6 +406,8 @@ createApp({
 		// prices
 		this.prices.basic.regular      = data["basic-regular"];
 		this.prices.basic.sale         = data["basic-sale"];
+		this.prices.donation.customer  = data["donation-customer"];
+		this.prices.donation.team      = data["donation-team"];
 		this.prices.enterprise.regular = data["enterprise-regular"];
 		this.prices.enterprise.sale    = data["enterprise-sale"];
 
@@ -427,6 +432,10 @@ createApp({
 		basic: {
 			regular: <?= $basic->price('EUR')->sale() ?>,
 			sale: <?= $basic->price('EUR')->sale() ?>,
+		},
+		donation: {
+			customer: <?= $basic->price('EUR')->customerDonation() ?>,
+			team: <?= $basic->price('EUR')->teamDonation() ?>,
 		},
 		enterprise: {
 			regular: <?= $enterprise->price('EUR')->sale() ?>,

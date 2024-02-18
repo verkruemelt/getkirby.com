@@ -60,6 +60,8 @@ return [
 			return json_encode([
 				'basic-regular'         => $basic->price()->regular(),
 				'basic-sale'            => $basic->price()->sale(),
+				'donation-team'         => $basic->price()->teamDonation(),
+				'donation-customer'     => $basic->price()->customerDonation(),
 				'enterprise-regular'    => $enterprise->price()->regular(),
 				'enterprise-sale'       => $enterprise->price()->sale(),
 				'country'               => $visitor->country(),

@@ -60,9 +60,18 @@ class Price
 	 * Gets the additional optional donation amount
 	 * per license in the customer currency
 	 */
-	public function donation(): int
+	public function customerDonation(): int
 	{
 		return $this->convert(option('buy.donation.customerAmount'));
+	}
+
+	/**
+	 * Gets the team donation amount
+	 * per license in the customer currency
+	 */
+	public function teamDonation(): int
+	{
+		return $this->convert(option('buy.donation.teamAmount'));
 	}
 
 	/**
