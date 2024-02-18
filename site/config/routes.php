@@ -140,6 +140,73 @@ return [
 		},
 	],
 	[
+		'pattern' => 'buy/(enterprise|basic)',
+		'action' => function (string $productId) {
+			try {
+				$product     = Product::from($productId);
+				$price       = $product->price();
+				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount'));
+
+				$eurPrice       = $product->price('EUR')->sale();
+				$localizedPrice = $price->sale();
+
+				$prices  = [
+					'EUR:' . $eurPrice,
+					$price->currency . ':' . $localizedPrice,
+				];
+
+				go($product->checkout('buy', compact('prices', 'passthrough')));
+			} catch (Throwable $e) {
+				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
+			}
+		},
+	],
+	[
+		'pattern' => 'buy/volume',
+		'method'  => 'POST',
+		'action'  => function () {
+			$productId = get('product', 'basic');
+			$quantity  = (int)get('volume', 5);
+
+			try {
+				$product     = Product::from($productId);
+				$price       = $product->price();
+				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount') * $quantity);
+
+				$eurPrice       = $product->price('EUR')->volume($quantity);
+				$localizedPrice = $price->volume($quantity);
+
+				$prices  = [
+					'EUR:' . $eurPrice,
+					$price->currency . ':' . $localizedPrice,
+				];
+
+				go($product->checkout('buy', compact('prices', 'quantity', 'passthrough')));
+			} catch (Throwable $e) {
+				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
+			}
+		}
+	],
+	[
+		'pattern' => 'buy/volume/(enterprise|basic)/(:num)',
+		'action'  => function (string $productId, int $quantity) {
+			try {
+				$product     = Product::from($productId);
+				$price       = $product->price();
+				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount') * $quantity);
+
+				$prices  = [
+					'EUR:' . $product->price('EUR')->volume($quantity),
+					$price->currency . ':' . $price->volume($quantity),
+				];
+
+				go($product->checkout('buy', compact('prices', 'quantity', 'passthrough')));
+			} catch (Throwable $e) {
+				die($e->getMessage() . '<br>Please contact us: support@getkirby.com');
+			}
+		}
+	],
+	[
 		'pattern' => 'pixels',
 		'action'  => function () {
 			return new Page([
