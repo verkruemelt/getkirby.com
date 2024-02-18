@@ -28,7 +28,7 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr>
+					<tr v-if="vatRate > 0">
 						<th>
 							VAT ({{ vatRate }}%)
 						</th>
