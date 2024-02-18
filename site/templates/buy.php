@@ -320,7 +320,7 @@ document.addEventListener("click", (event) => {
 
 const checkout = document.querySelector(".checkout");
 
-const zipCountries = [
+const postalCodeCountries = [
 	"AU",
 	"CA",
 	"FR",
@@ -349,13 +349,14 @@ createApp({
 			return formatter.format(amount);
 		}
 	},
-	city: "",
+	cachePersonalInfo() {
+		window.localStorage.setItem("buy.personalInfo", JSON.stringify(this.personalInfo));
+	},
 	closeCheckout(event) {
 		if (event.target === checkout) {
 			checkout.close();
 		}
 	},
-	company: "",
 	country: "",
 	currencySign: "€",
 	currencySignTrimmed: "€",
@@ -378,17 +379,21 @@ createApp({
 		const factor = this.discountRate / 100;
 		return this.netLicenseAmount * factor * -1;
 	},
-	donation: false,
 	get donationText() {
 		return "Donate an additional " + this.currencySign + this.prices.donation.customer + " per license 💛";
 	},
 	get donationAmount() {
-		return this.donation ? (this.prices.donation.customer * this.quantity) : 0;
+		return this.personalInfo.donate ? (this.prices.donation.customer * this.quantity) : 0;
 	},
-	email: "",
 	product: "basic",
 	async mounted() {
-		// fetch with options that allow using the preloaded response
+		// load the personal info from the last purchase if available
+		const personalInfo = window.localStorage.getItem("buy.personalInfo");
+		if (personalInfo) {
+			this.personalInfo = JSON.parse(personalInfo);
+		}
+
+		// fetch prices with options that allow using the preloaded response
 		const response = await fetch("/buy/prices", {
 			method: "GET",
 			credentials: "include",
@@ -413,10 +418,9 @@ createApp({
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
-	get needsZip() {
-		return zipCountries.includes(this.country);
+	get needsPostalCode() {
+		return postalCodeCountries.includes(this.country);
 	},
-	newsletter: false,
 	get netLicenseAmount() {
 		return this.price * this.quantity;
 	},
@@ -424,6 +428,17 @@ createApp({
 		this.product = product;
 		this.quantity = quantity;
 		checkout.showModal();
+	},
+	personalInfo: {
+		city: "",
+		company: "",
+		donate: false,
+		email: "",
+		newsletter: false,
+		postalCode: "",
+		state: "",
+		street: "",
+		vatId: "",
 	},
 	get price() {
 		return this.prices[this.product].sale;
@@ -444,8 +459,6 @@ createApp({
 	},
 	quantity: 1,
 	revenueLimit: "",
-	state: "",
-	street: "",
 	get subtotal() {
 		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
 	},
@@ -457,10 +470,8 @@ createApp({
 		return this.subtotal * rate / 100;
 	},
 	vatRate: 0,
-	vatId: "",
 	get vatIdExists() {
-		return this.vatId?.length > 0;
+		return this.personalInfo.vatId?.length > 0;
 	},
-	zip: "",
 }).mount();
 </script>

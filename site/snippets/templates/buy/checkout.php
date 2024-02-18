@@ -1,5 +1,5 @@
 <dialog class="dialog checkout" @click="closeCheckout">
-	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank">
+	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
 		<div class="checkout-preview">
 			<div>
 				<label class="label">Your order</label>
@@ -22,7 +22,7 @@
 						</th>
 						<td>{{ amount(discountAmount) }}</td>
 					</tr>
-					<tr v-if="donation">
+					<tr v-if="personalInfo.donate">
 						<th>
 							Your donation
 						</th>
@@ -56,7 +56,7 @@
 					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 				</p>
 				<label class="checkbox">
-					<input id="donate" type="checkbox" name="donate" v-model="donation">
+					<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
 					<span v-text="donationText">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
 				</label>
 			</div>
@@ -64,7 +64,7 @@
 		<div class="checkout-form">
 			<div class="field">
 				<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
-				<input id="email" name="email" class="input" type="email" required v-model="email" placeholder="mail@example.com">
+				<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
 			</div>
 			<div class="field">
 				<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
@@ -74,42 +74,42 @@
 					<?php endforeach ?>
 				</select>
 			</div>
-			<div v-if="needsZip" class="field">
-				<label class="label" for="zip">Postal Code <abbr title="Required">*</abbr></label>
-				<input id="zip" name="postalCode" class="input" autocomplete="postal-code" :required="needsZip" v-model="zip" type="text">
+			<div v-if="needsPostalCode" class="field">
+				<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
+				<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
 			</div>
 			<div class="field">
 				<label class="label" for="vatId">VAT ID</label>
-				<input id="vatId" name="vatId" class="input" type="text" v-model="vatId">
+				<input id="vatId" name="vatId" class="input" type="text" v-model="personalInfo.vatId">
 				<p v-if="vatIdExists" class="color-gray-700 text-xs pt-1">Your VAT ID will be validated on checkout</p>
 			</div>
 
 			<fieldset v-if="vatIdExists">
 				<div class="field">
 					<label class="label" for="company">Company Name <abbr title="Required">*</abbr></label>
-					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="company" :required="vatIdExists">
+					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="personalInfo.company" :required="vatIdExists">
 				</div>
 
 				<div class="field">
 					<label class="label" for="street">Street <abbr title="Required">*</abbr></label>
-					<input id="street" name="street" class="input" type="text" v-model="street" :required="vatIdExists">
+					<input id="street" name="street" class="input" type="text" v-model="personalInfo.street" :required="vatIdExists">
 				</div>
 
 				<div class="field">
 					<label class="label" for="city">Town/City <abbr title="Required">*</abbr></label>
-					<input id="city" name="city" class="input" type="text" v-model="city" :required="vatIdExists">
+					<input id="city" name="city" class="input" type="text" v-model="personalInfo.city" :required="vatIdExists">
 				</div>
 
 				<div class="field">
 					<label class="label" for="state">State/County <abbr title="Required">*</abbr></label>
-					<input id="state" name="state" class="input" type="text" v-model="state" :required="vatIdExists">
+					<input id="state" name="state" class="input" type="text" v-model="personalInfo.state" :required="vatIdExists">
 				</div>
 			</fieldset>
 
 			<div class="field">
 				<label class="label" for="newsletter">Newsletter</label>
 				<label class="checkbox">
-					<input id="newsletter" type="checkbox" name="newsletter" v-model="newsletter">
+					<input id="newsletter" type="checkbox" name="newsletter" v-model="personalInfo.newsletter">
 					Subscribe to our Kosmos newsletter
 				</label>
 				<p class="color-gray-700 text-xs pt-1">We won't ever spam you! You can unsubscribe at any time. <a class="underline" target="_blank" href="<?= url('kosmos') ?>">Learn more about Kosmos…</a></p>
