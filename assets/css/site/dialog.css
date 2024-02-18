@@ -50,7 +50,7 @@ body:has(.dialog[open]) {
 }
 
 .dialog-form .checkbox {
-	height: 2.25rem;
+	min-height: 2.25rem;
 	display: flex;
 	align-items: center;
 	color: var(--color-black);
