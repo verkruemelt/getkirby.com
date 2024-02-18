@@ -110,8 +110,9 @@
 				<label class="label" for="newsletter">Newsletter</label>
 				<label class="checkbox">
 					<input id="newsletter" type="checkbox" name="newsletter" v-model="newsletter">
-					Subscribe to our newsletter
+					Subscribe to our Kosmos newsletter
 				</label>
+				<p class="color-gray-700 text-xs pt-1">We won't ever spam you! You can unsubscribe at any time. <a class="underline" target="_blank" href="<?= url('kosmos') ?>">Learn more about Kosmos…</a></p>
 			</div>
 
 			<div class="buttons">
