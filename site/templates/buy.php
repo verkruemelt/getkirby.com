@@ -356,7 +356,7 @@ createApp({
 		}
 	},
 	company: "",
-	country: "DE",
+	country: "",
 	currencySign: "€",
 	currencySignTrimmed: "€",
 	get discountRate() {
@@ -378,7 +378,7 @@ createApp({
 		const factor = this.discountRate / 100;
 		return this.netLicenseAmount * factor * -1;
 	},
-	donation: true,
+	donation: false,
 	get donationAmount() {
 		return this.donation ? (1 * this.quantity) : 0;
 	},
