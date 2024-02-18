@@ -52,7 +52,7 @@
 			<div class="field">
 				<label for="donate" class="label">Support a good cause</label>
 				<p class="mb-3">
-					For every license purchase we donate €<?= $donation['teamAmount'] ?><span v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
+					For every purchased license we donate €<?= $donation['teamAmount'] ?><span v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
 					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 				</p>
 				<label class="checkbox">
