@@ -361,17 +361,11 @@ createApp({
 	currencySign: "€",
 	currencySignTrimmed: "€",
 	get discountRate() {
-		if (this.quantity >= 15) {
-			return 15;
+		<?php foreach ($discountsReversed as $minimum => $rate): ?>
+		if (this.quantity >= <?= $minimum ?>) {
+			return <?= $rate ?>;
 		}
-
-		if (this.quantity >= 10) {
-			return 10;
-		}
-
-		if (this.quantity >= 5) {
-			return 5;
-		}
+		<?php endforeach ?>
 
 		return 0;
 	},
