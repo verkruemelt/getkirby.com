@@ -30,7 +30,7 @@
 					</tr>
 					<tr v-if="vatRate > 0">
 						<th>
-							VAT ({{ vatRate }}%)
+							VAT ({{ vatIdExists ? 0 : vatRate }}%)
 						</th>
 						<td>{{ amount(vatAmount) }}</td>
 					</tr>
