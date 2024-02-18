@@ -58,7 +58,7 @@ class Price
 
 	/**
 	 * Gets the additional optional donation amount
-	 * per transaction in the customer currency
+	 * per license in the customer currency
 	 */
 	public function donation(): int
 	{

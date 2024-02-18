@@ -84,6 +84,9 @@ enum Product: string
 		};
 	}
 
+	/**
+	 * Returns the machine-readable enum value
+	 */
 	public function value(): string
 	{
 		return $this->value;

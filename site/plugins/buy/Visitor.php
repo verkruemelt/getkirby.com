@@ -198,8 +198,8 @@ class Visitor
 	 * Returns the VAT rate for the country on top
 	 * of the net price if available
 	 */
-	public function vatRate(): float
+	public function vatRate(): float|null
 	{
-		return $this->vatRate ?? 0;
+		return $this->vatRate;
 	}
 }

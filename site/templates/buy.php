@@ -103,7 +103,6 @@
 	gap: .5rem;
 	cursor: pointer;
 }
-
 </style>
 
 <article v-scope data-loading @mounted="mounted">
@@ -214,14 +213,13 @@
 
 	<section class="mb-42">
 		<form class="volume-discounts" method="POST" target="_blank" action="<?= url('buy/volume') ?>">
-			<input type="hidden" name="donate">
 			<header class="flex items-baseline justify-between mb-6">
 				<h2 class="h2">Volume discounts</h2>
 				<fieldset>
 					<legend class="sr-only">License Type</legend>
 					<div class="volume-toggles">
-						<label><input type="radio" name="product" value="<?= $basic->value() ?>" v-model="license" checked> <?= $basic->label() ?></label>
-						<label><input type="radio" name="product" value="<?= $enterprise->value() ?>" v-model="license"> <?= $enterprise->label() ?></label>
+						<label><input type="radio" name="product" value="<?= $basic->value() ?>" v-model="product" checked> <?= $basic->label() ?></label>
+						<label><input type="radio" name="product" value="<?= $enterprise->value() ?>" v-model="product"> <?= $enterprise->label() ?></label>
 					</div>
 				</fieldset>
 			</header>
@@ -241,7 +239,7 @@
 								<?php endif ?>
 							</div>
 
-							<button class="btn btn--filled mb-3" @click.prevent="openCheckout(license, <?= $volume ?>)" name="volume" value="<?= $volume ?>">
+							<button class="btn btn--filled mb-3" @click.prevent="openCheckout(product, <?= $volume ?>)" name="volume" value="<?= $volume ?>">
 								<?= icon('cart') ?> Buy now
 							</button>
 						</article>
@@ -322,7 +320,7 @@ document.addEventListener("click", (event) => {
 
 const checkout = document.querySelector(".checkout");
 
-const zips = [
+const zipCountries = [
 	"AU",
 	"CA",
 	"FR",
@@ -377,17 +375,16 @@ createApp({
 		return 0;
 	},
 	get discountAmount() {
-		const factor = (100 - this.discountRate) / 100;
-		return (this.netLicenseAmount - (this.netLicenseAmount * factor)) * -1;
+		const factor = this.discountRate / 100;
+		return this.netLicenseAmount * factor * -1;
 	},
 	donation: true,
 	get donationAmount() {
 		return this.donation ? (1 * this.quantity) : 0;
 	},
 	email: "",
-	license: "basic",
+	product: "basic",
 	async mounted() {
-
 		// fetch with options that allow using the preloaded response
 		const response = await fetch("/buy/prices", {
 			method: "GET",
@@ -401,7 +398,7 @@ createApp({
 		this.currencySignTrimmed = data["currency-sign-trimmed"];
 		this.country             = data["country"];
 		this.revenueLimit        = data["revenue-limit"];
-		this.vatRate             = data["vat-rate"];
+		this.vatRate             = data["vat-rate"] || 0;
 
 		// prices
 		this.prices.basic.regular      = data["basic-regular"];
@@ -412,7 +409,7 @@ createApp({
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
 	get needsZip() {
-		return zips.includes(this.country);
+		return zipCountries.includes(this.country);
 	},
 	newsletter: false,
 	get netLicenseAmount() {
@@ -421,22 +418,22 @@ createApp({
 	get netAmount() {
 		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
 	},
-	openCheckout(license, quantity = 1) {
-		this.license = license;
+	openCheckout(product, quantity = 1) {
+		this.product = product;
 		this.quantity = quantity;
 		checkout.showModal();
 	},
 	get price() {
-		return this.prices[this.license].sale;
+		return this.prices[this.product].sale;
 	},
 	prices: {
 		basic: {
-			regular: 99,
-			sale: 99,
+			regular: <?= $basic->price('EUR')->sale() ?>,
+			sale: <?= $basic->price('EUR')->sale() ?>,
 		},
 		enterprise: {
-			regular: 349,
-			sale: 349,
+			regular: <?= $enterprise->price('EUR')->sale() ?>,
+			sale: <?= $enterprise->price('EUR')->sale() ?>,
 		}
 	},
 	quantity: 1,
@@ -453,7 +450,7 @@ createApp({
 	vatRate: 0,
 	vatId: "",
 	get vatIdExists() {
-		return Boolean(this.vatId?.length);
+		return this.vatId?.length > 0;
 	},
 	zip: "",
 }).mount();

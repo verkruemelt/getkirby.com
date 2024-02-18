@@ -81,16 +81,16 @@ return [
 			$country    = get('country');
 			$donate     = get('donate') === 'on';
 			$email      = get('email');
-			$license    = get('license');
+			$productId  = get('product');
 			$newsletter = get('newsletter') === 'on';
 			$postalCode = get('postalCode');
 			$state      = get('state');
 			$street     = get('street');
-			$quantity   = get('quantity', 1);
+			$quantity   = (int)get('quantity', 1);
 			$vatId      = get('vatId');
 
 			try {
-				$product     = Product::from($license);
+				$product     = Product::from($productId);
 				$price       = $product->price();
 				$message     = $product->revenueLimit();
 				$passthrough = new Passthrough(teamDonation: option('buy.donation.teamAmount') * $quantity);

@@ -31,9 +31,6 @@ img {
 .bg-yellow {
 	background: var(--color-yellow-400);
 }
-.bg-yellow-light {
-	background: var(--color-yellow-300);
-}
 
 .border {
 	position: relative;

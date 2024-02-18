@@ -8,7 +8,7 @@
 						<th>
 							<div class="inputs">
 								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
-								<select required name="license" v-model="license" value="<?= $basic->value() ?>">
+								<select required name="product" v-model="product" value="<?= $basic->value() ?>">
 									<option value="<?= $basic->value() ?>" selected>Kirby <?= $basic->label() ?></option>
 									<option value="<?= $enterprise->value() ?>">Kirby <?= $enterprise->label() ?></option>
 								</select>
@@ -79,7 +79,6 @@
 			</div>
 
 			<fieldset v-if="vatIdExists">
-
 				<div class="field">
 					<label class="label" for="company">Company Name <abbr title="Required">*</abbr></label>
 					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="company" :required="vatIdExists">
