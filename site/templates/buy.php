@@ -69,7 +69,7 @@
 .price {
 	display: inline-flex;
 	align-items: baseline;
-	gap: 0.125rem;
+	gap: 0.3rem;
 }
 .price[data-regular] {
 	color: var(--color-gray-700);
@@ -340,7 +340,7 @@ createApp({
 				minimumFractionDigits: 2,
 				maximumFractionDigits: 2,
 			});
-			return this.currencySignTrimmed + formatter.format(amount);
+			return this.currencySign + formatter.format(amount);
 		}
 	},
 	amountDisplay(amount) {
