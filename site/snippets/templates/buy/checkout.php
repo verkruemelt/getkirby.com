@@ -28,7 +28,7 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr class="total" v-if="vatRate > 0">
+					<tr class="subtotal" v-if="vatRate > 0">
 						<th>
 							Subtotal
 						</th>
@@ -186,8 +186,10 @@
 .checkout-preview td {
 	text-align: right;
 }
-.checkout-preview tr.total * {
+.checkout-preview :where(tr.total, tr.subtotal) > * {
 	border-top-width: 2px;
+}
+.checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
 }
 </style>
