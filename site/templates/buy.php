@@ -357,7 +357,6 @@ createApp({
 			checkout.close();
 		}
 	},
-	country: "",
 	currencySign: "€",
 	currencySignTrimmed: "€",
 	get discountRate() {
@@ -381,12 +380,6 @@ createApp({
 	},
 	product: "basic",
 	async mounted() {
-		// load the personal info from the last purchase if available
-		const personalInfo = window.localStorage.getItem("buy.personalInfo");
-		if (personalInfo) {
-			this.personalInfo = JSON.parse(personalInfo);
-		}
-
 		// fetch prices with options that allow using the preloaded response
 		const response = await fetch("/buy/prices", {
 			method: "GET",
@@ -396,11 +389,11 @@ createApp({
 
 		const data = await response.json();
 
-		this.currencySign        = data["currency-sign"];
-		this.currencySignTrimmed = data["currency-sign-trimmed"];
-		this.country             = data["country"];
-		this.revenueLimit        = data["revenue-limit"];
-		this.vatRate             = (data["vat-rate"] || 0) * 100;
+		this.currencySign         = data["currency-sign"];
+		this.currencySignTrimmed  = data["currency-sign-trimmed"];
+		this.personalInfo.country = data["country"];
+		this.revenueLimit         = data["revenue-limit"];
+		this.vatRate              = (data["vat-rate"] || 0) * 100;
 
 		// prices
 		this.prices.basic.regular      = data["basic-regular"];
@@ -410,10 +403,16 @@ createApp({
 		this.prices.enterprise.regular = data["enterprise-regular"];
 		this.prices.enterprise.sale    = data["enterprise-sale"];
 
+		// load the personal info from the last purchase if available
+		const personalInfo = window.localStorage.getItem("buy.personalInfo");
+		if (personalInfo) {
+			this.personalInfo = JSON.parse(personalInfo);
+		}
+
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
 	get needsPostalCode() {
-		return postalCodeCountries.includes(this.country);
+		return postalCodeCountries.includes(this.personalInfo.country);
 	},
 	get netLicenseAmount() {
 		return this.price * this.quantity;
@@ -426,6 +425,7 @@ createApp({
 	personalInfo: {
 		city: "",
 		company: "",
+		country: "",
 		donate: false,
 		email: "",
 		newsletter: false,

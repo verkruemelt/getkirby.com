@@ -75,7 +75,7 @@
 			</div>
 			<div class="field">
 				<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
-				<select id="country" name="country" required autocomplete="country" class="input" v-model="country">
+				<select id="country" name="country" required autocomplete="country" class="input" v-model="personalInfo.country">
 					<?php foreach ($countries as $countryCode => $countryName): ?>
 					<option value="<?= $countryCode ?>"><?= $countryName ?></option>
 					<?php endforeach ?>
