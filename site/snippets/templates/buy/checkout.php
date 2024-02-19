@@ -7,7 +7,7 @@
 					<tr>
 						<th>
 							<div class="inputs">
-								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
+								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity" @input="restrictQuantity">
 								<select required name="product" v-model="product" value="<?= $basic->value() ?>">
 									<option value="<?= $basic->value() ?>" selected>Kirby <?= $basic->label() ?></option>
 									<option value="<?= $enterprise->value() ?>">Kirby <?= $enterprise->label() ?></option>

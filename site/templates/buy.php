@@ -452,6 +452,13 @@ createApp({
 		}
 	},
 	quantity: 1,
+	restrictQuantity(event) {
+		// allow an empty input...
+		if (this.quantity !== "") {
+			// ...but otherwise prevent values outside of the valid range
+			this.quantity = Math.max(Math.min(this.quantity, event.target.max), event.target.min);
+		}
+	},
 	revenueLimit: "",
 	get subtotal() {
 		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
