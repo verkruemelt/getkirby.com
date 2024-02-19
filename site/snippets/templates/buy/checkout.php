@@ -50,6 +50,7 @@
 				</table>
 			</div>
 
+			<?php if ($donation['customerAmount'] > 0): ?>
 			<div>
 				<h2 for="donate" class="font-bold">Support a good cause</h2>
 				<p class="mb-3">
@@ -61,6 +62,7 @@
 					<span v-text="donationText">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
 				</label>
 			</div>
+			<?php endif ?>
 		</div>
 		<div class="checkout-form">
 			<div class="field">
