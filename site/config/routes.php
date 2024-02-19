@@ -58,18 +58,25 @@ return [
 			$visitor    = Paddle::visitor();
 
 			return json_encode([
-				'basic-regular'         => $basic->price()->regular(),
-				'basic-sale'            => $basic->price()->sale(),
-				'donation-team'         => $basic->price()->teamDonation(),
-				'donation-customer'     => $basic->price()->customerDonation(),
-				'enterprise-regular'    => $enterprise->price()->regular(),
-				'enterprise-sale'       => $enterprise->price()->sale(),
-				'country'               => $visitor->country(),
-				'currency-sign'         => $visitor->currencySign(),
-				'currency-sign-trimmed' => rtrim($visitor->currencySign(), ' '),
-				'revenue-limit'         => $visitor->currency() !== 'EUR' ? ' (' . $visitor->revenueLimit(1000000) . ')' : '',
-				'vat-rate'              => $visitor->vatRate(),
-				'status'                => $visitor->error() ?? 'OK'
+				'status'   => $visitor->error() ?? 'OK',
+				'country'  => $visitor->country(),
+				'currency' => $visitor->currencySign(),
+				'prices' => [
+					'basic' => [
+						'regular' => $basic->price()->regular(),
+						'sale'    => $basic->price()->sale()
+					],
+					'donation' => [
+						'customer' => $basic->price()->customerDonation(),
+						'team'     => $basic->price()->teamDonation(),
+					],
+					'enterprise' => [
+						'regular' => $enterprise->price()->regular(),
+						'sale'    => $enterprise->price()->sale()
+					],
+				],
+				'revenueLimit' => $visitor->currency() !== 'EUR' ? ' (' . $visitor->revenueLimit(1000000) . ')' : '',
+				'vatRate'      => $visitor->vatRate() ?? 0,
 			], JSON_UNESCAPED_UNICODE);
 		}
 	],

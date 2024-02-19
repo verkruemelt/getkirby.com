@@ -29,15 +29,15 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr class="subtotal" v-if="vatRate > 0">
+					<tr class="subtotal" v-if="locale.vatRate > 0">
 						<th>
 							Subtotal
 						</th>
 						<td>{{ amount(subtotal) }}</td>
 					</tr>
-					<tr v-if="vatRate > 0">
+					<tr v-if="locale.vatRate > 0">
 						<th>
-							VAT ({{ vatIdExists ? 0 : vatRate }}%)
+							VAT ({{ vatIdExists ? 0 : locale.vatRate * 100 }}%)
 						</th>
 						<td>{{ amount(vatAmount) }}</td>
 					</tr>
@@ -54,7 +54,7 @@
 			<div>
 				<h2 for="donate" class="font-bold">Support a good cause</h2>
 				<p class="mb-3">
-					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
+					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="locale.currency !== '€'" v-text="' (~ ' + locale.currency + locale.prices.donation.team + ')'"></span> to
 					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 				</p>
 				<label class="checkbox">

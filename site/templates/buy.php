@@ -128,16 +128,16 @@
 
 						<?php if ($sale->isActive()): ?>
 						<span class="price px-1" data-regular>
-							<span v-text="currencySign">€</span>
-							<span class="amount" v-text="amountDisplay(prices.basic.regular)"><?= $basic->price('EUR')->regular() ?></span>
+							<span v-text="locale.currency">€</span>
+							<span class="amount" v-text="amountDisplay(locale.prices.basic.regular)"><?= $basic->price('EUR')->regular() ?></span>
 						</span>
 						<?php endif ?>
 					</h2>
 
 					<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="h2 block mb-3">
 						<span class="price" data-sale>
-							<span class="currency-sign" v-text="currencySignTrimmed">€</span>
-							<span class="amount" v-text="amountDisplay(prices.basic.sale)"><?= $basic->price('EUR')->sale() ?></span>
+							<span class="currency-sign" v-text="locale.currency.trim()">€</span>
+							<span class="amount" v-text="amountDisplay(locale.prices.basic.sale)"><?= $basic->price('EUR')->sale() ?></span>
 						</span>
 						per site
 					</a>
@@ -148,7 +148,7 @@
 				<details class="revenue">
 					<summary><span>Revenue limit: <strong>€1M / year</strong></span> <?= icon('info') ?></summary>
 					<div>
-						<p>Your revenue or funding is less than <strong>€1&nbsp;million<span v-if="revenueLimit.length" v-text="revenueLimit"></span></strong> in the <strong>last 12 months</strong>.</p>
+						<p>Your revenue or funding is less than <strong>€1&nbsp;million<span v-if="locale.revenueLimit.length" v-text="locale.revenueLimit"></span></strong> in the <strong>last 12 months</strong>.</p>
 						<p>If you build a website for a client, the limit has to fit the revenue of your client.</p>
 					</div>
 				</details>
@@ -172,16 +172,16 @@
 
 						<?php if ($sale->isActive()): ?>
 						<span class="price px-1" data-regular>
-							<span v-text="currencySign">€</span>
-							<span class="amount" v-text="amountDisplay(prices.enterprise.regular)"><?= $enterprise->price('EUR')->regular() ?></span>
+							<span v-text="locale.currency">€</span>
+							<span class="amount" v-text="amountDisplay(locale.prices.enterprise.regular)"><?= $enterprise->price('EUR')->regular() ?></span>
 						</span>
 						<?php endif ?>
 					</h2>
 
 					<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="h2 block mb-3">
 						<span class="price" data-sale>
-							<span class="currency-sign" v-text="currencySignTrimmed">€</span>
-							<span class="amount" v-text="amountDisplay(prices.enterprise.sale)"><?= $enterprise->price('EUR')->sale() ?></span>
+							<span class="currency-sign" v-text="locale.currency.trim()">€</span>
+							<span class="amount" v-text="amountDisplay(locale.prices.enterprise.sale)"><?= $enterprise->price('EUR')->sale() ?></span>
 						</span>
 						per site
 					</a>
@@ -334,13 +334,98 @@ const postalCodeCountries = [
 ];
 
 createApp({
+	// props dynamically populated by the backend
+	locale: {
+		country: "",
+		currency: "€",
+		prices: {
+			basic: {
+				regular: <?= $basic->price('EUR')->sale() ?>,
+				sale: <?= $basic->price('EUR')->sale() ?>,
+			},
+			donation: {
+				customer: <?= $basic->price('EUR')->customerDonation() ?>,
+				team: <?= $basic->price('EUR')->teamDonation() ?>,
+			},
+			enterprise: {
+				regular: <?= $enterprise->price('EUR')->sale() ?>,
+				sale: <?= $enterprise->price('EUR')->sale() ?>,
+			}
+		},
+		revenueLimit: "",
+		status: null,
+		vatRate: 0,
+	},
+
+	// persistent user-generated props
+	personalInfo: {
+		city: "",
+		company: "",
+		country: "",
+		donate: false,
+		email: "",
+		newsletter: false,
+		postalCode: "",
+		state: "",
+		street: "",
+		vatId: "",
+	},
+
+	// dynamic props
+	product: "basic",
+	quantity: 1,
+
+	// computed
+	get discountRate() {
+		<?php foreach ($discountsReversed as $minimum => $rate): ?>
+		if (this.quantity >= <?= $minimum ?>) {
+			return <?= $rate ?>;
+		}
+		<?php endforeach ?>
+
+		return 0;
+	},
+	get discountAmount() {
+		const factor = this.discountRate / 100;
+		return this.netLicenseAmount * factor * -1;
+	},
+	get donationText() {
+		return "Donate an additional " + this.locale.currency + this.locale.prices.donation.customer + " per license 💛";
+	},
+	get donationAmount() {
+		return this.personalInfo.donate ? (this.locale.prices.donation.customer * this.quantity) : 0;
+	},
+	get needsPostalCode() {
+		return postalCodeCountries.includes(this.personalInfo.country);
+	},
+	get netLicenseAmount() {
+		return this.price * this.quantity;
+	},
+	get price() {
+		return this.locale.prices[this.product].sale;
+	},
+	get subtotal() {
+		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
+	},
+	get totalAmount() {
+		return this.subtotal + this.vatAmount;
+	},
+	get vatAmount() {
+		const rate = this.vatIdExists ? 0 : this.locale.vatRate;
+		return this.subtotal * rate;
+	},
+	get vatIdExists() {
+		return this.personalInfo.vatId?.length > 0;
+	},
+
+	// methods
 	amount(amount) {
 		if (Number.isFinite(amount) === true) {
 			const formatter = new Intl.NumberFormat("en", {
 				minimumFractionDigits: 2,
 				maximumFractionDigits: 2,
 			});
-			return this.currencySign + formatter.format(amount);
+			return this.locale.currency + formatter.format(amount);
 		}
 	},
 	amountDisplay(amount) {
@@ -357,28 +442,6 @@ createApp({
 			checkout.close();
 		}
 	},
-	currencySign: "€",
-	currencySignTrimmed: "€",
-	get discountRate() {
-		<?php foreach ($discountsReversed as $minimum => $rate): ?>
-		if (this.quantity >= <?= $minimum ?>) {
-			return <?= $rate ?>;
-		}
-		<?php endforeach ?>
-
-		return 0;
-	},
-	get discountAmount() {
-		const factor = this.discountRate / 100;
-		return this.netLicenseAmount * factor * -1;
-	},
-	get donationText() {
-		return "Donate an additional " + this.currencySign + this.prices.donation.customer + " per license 💛";
-	},
-	get donationAmount() {
-		return this.personalInfo.donate ? (this.prices.donation.customer * this.quantity) : 0;
-	},
-	product: "basic",
 	async mounted() {
 		// fetch prices with options that allow using the preloaded response
 		const response = await fetch("/buy/prices", {
@@ -387,21 +450,8 @@ createApp({
 			mode: "no-cors",
 		});
 
-		const data = await response.json();
-
-		this.currencySign         = data["currency-sign"];
-		this.currencySignTrimmed  = data["currency-sign-trimmed"];
-		this.personalInfo.country = data["country"];
-		this.revenueLimit         = data["revenue-limit"];
-		this.vatRate              = (data["vat-rate"] || 0) * 100;
-
-		// prices
-		this.prices.basic.regular      = data["basic-regular"];
-		this.prices.basic.sale         = data["basic-sale"];
-		this.prices.donation.customer  = data["donation-customer"];
-		this.prices.donation.team      = data["donation-team"];
-		this.prices.enterprise.regular = data["enterprise-regular"];
-		this.prices.enterprise.sale    = data["enterprise-sale"];
+		this.locale               = await response.json();
+		this.personalInfo.country = this.locale.country;
 
 		// load the personal info from the last purchase if available
 		const personalInfo = window.localStorage.getItem("buy.personalInfo");
@@ -411,68 +461,17 @@ createApp({
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
-	get needsPostalCode() {
-		return postalCodeCountries.includes(this.personalInfo.country);
-	},
-	get netLicenseAmount() {
-		return this.price * this.quantity;
-	},
 	openCheckout(product, quantity = 1) {
 		this.product = product;
 		this.quantity = quantity;
 		checkout.showModal();
 	},
-	personalInfo: {
-		city: "",
-		company: "",
-		country: "",
-		donate: false,
-		email: "",
-		newsletter: false,
-		postalCode: "",
-		state: "",
-		street: "",
-		vatId: "",
-	},
-	get price() {
-		return this.prices[this.product].sale;
-	},
-	prices: {
-		basic: {
-			regular: <?= $basic->price('EUR')->sale() ?>,
-			sale: <?= $basic->price('EUR')->sale() ?>,
-		},
-		donation: {
-			customer: <?= $basic->price('EUR')->customerDonation() ?>,
-			team: <?= $basic->price('EUR')->teamDonation() ?>,
-		},
-		enterprise: {
-			regular: <?= $enterprise->price('EUR')->sale() ?>,
-			sale: <?= $enterprise->price('EUR')->sale() ?>,
-		}
-	},
-	quantity: 1,
 	restrictQuantity(event) {
 		// allow an empty input...
 		if (this.quantity !== "") {
 			// ...but otherwise prevent values outside of the valid range
 			this.quantity = Math.max(Math.min(this.quantity, event.target.max), event.target.min);
 		}
-	},
-	revenueLimit: "",
-	get subtotal() {
-		return this.netLicenseAmount + this.donationAmount + this.discountAmount;
-	},
-	get totalAmount() {
-		return this.subtotal + this.vatAmount;
-	},
-	get vatAmount() {
-		const rate = this.vatIdExists ? 0 : this.vatRate;
-		return this.subtotal * rate / 100;
-	},
-	vatRate: 0,
-	get vatIdExists() {
-		return this.personalInfo.vatId?.length > 0;
 	},
 }).mount();
 </script>
