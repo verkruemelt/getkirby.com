@@ -59,7 +59,11 @@
 				</p>
 				<label class="checkbox">
 					<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
+					<?php if ($donation['customerAmount'] === $donation['teamAmount']): ?>
+					Match our donation 💛
+					<?php else: ?>
 					<span v-text="donationText">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
+					<?php endif ?>
 				</label>
 			</div>
 			<?php endif ?>
