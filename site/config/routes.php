@@ -75,7 +75,7 @@ return [
 						'sale'    => $enterprise->price()->sale()
 					],
 				],
-				'revenueLimit' => $visitor->currency() !== 'EUR' ? ' (' . $visitor->revenueLimit(1000000) . ')' : '',
+				'revenueLimit' => $visitor->currency() !== 'EUR' ? ' (' . $visitor->revenueLimit() . ')' : '',
 				'vatRate'      => $visitor->vatRate() ?? 0,
 			], JSON_UNESCAPED_UNICODE);
 		}

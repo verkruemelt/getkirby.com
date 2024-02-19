@@ -168,30 +168,11 @@ class Visitor
 	 * Returns the formatted approximate revenue limit
 	 * in the user's currency
 	 *
-	 * @param int $revenueLimit Limit in EUR to convert
+	 * @param bool $verbose Whether to use long suffixes
 	 */
-	public function revenueLimit(int $revenueLimit): string
+	public function revenueLimit(bool $verbose = false): string
 	{
-		$converted = $revenueLimit * $this->rate;
-
-		// shorten to three digits with K/M/B suffix
-		$suffix = '';
-		if ($converted >= 1000000000) {
-			$converted /= 1000000000;
-			$suffix = 'B';
-		} elseif ($converted >= 1000000) {
-			$converted /= 1000000;
-			$suffix = 'M';
-		} elseif ($converted >= 1000) {
-			$converted /= 1000;
-			$suffix = 'K';
-		}
-
-		// use two significant digits because it's just an approximation
-		$digits    = strlen(round($converted));
-		$converted = round($converted, -$digits + 2);
-
-		return '~ ' . $this->currencySign() . $converted . $suffix;
+		return RevenueLimit::approximation($this, $verbose);
 	}
 
 	/**

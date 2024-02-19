@@ -66,7 +66,7 @@ enum Product: string
 	public function revenueLimit(): string|null
 	{
 		return match ($this) {
-			static::Basic      => 'Revenue limit: €1M / year.',
+			static::Basic      => 'Revenue limit: ' . RevenueLimit::approximation() . ' / year.',
 			static::Enterprise => 'This license does not have a revenue limit.',
 			default            => null
 		};

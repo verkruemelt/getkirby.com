@@ -9,6 +9,7 @@ return [
 		'product' => 824340,
 		'regular' => 349,
 	],
+	'revenueLimit' => 1000000,
 	'sale' => [
 		'start'    => '2023-11-28',
 		'end'      => '2023-12-18',
