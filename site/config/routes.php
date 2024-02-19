@@ -126,7 +126,6 @@ return [
 					'passthrough'       => $passthrough,
 					'prices'            => $prices,
 					'quantity'          => $quantity,
-					'quantity_variable' => 0,
 					'vat_city'          => $city,
 					'vat_country'       => $country,
 					'vat_company_name'  => $company,
