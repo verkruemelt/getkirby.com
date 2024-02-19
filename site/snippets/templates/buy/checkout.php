@@ -2,7 +2,7 @@
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
 		<div class="checkout-preview">
 			<div>
-				<label class="label">Your order</label>
+				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
 						<th>
@@ -49,10 +49,10 @@
 				</table>
 			</div>
 
-			<div class="field">
-				<label for="donate" class="label">Support a good cause</label>
+			<div>
+				<h2 for="donate" class="font-bold">Support a good cause</h2>
 				<p class="mb-3">
-					For every purchased license we donate €<?= $donation['teamAmount'] ?><span v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
+					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
 					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 				</p>
 				<label class="checkbox">
