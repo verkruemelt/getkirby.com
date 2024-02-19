@@ -77,7 +77,6 @@ return [
 		'pattern' => 'buy',
 		'method'  => 'POST',
 		'action' => function () {
-			// TODO: Use all dynamic form values
 			$city       = get('city');
 			$company    = get('company');
 			$country    = get('country');
