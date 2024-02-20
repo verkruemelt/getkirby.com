@@ -1,7 +1,7 @@
 <dialog id="checkout" class="dialog checkout" :data-loading="isFetchingPrices" @click="closeCheckout">
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
 		<div class="checkout-preview">
-			<div class="mb-6">
+			<div>
 				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
@@ -227,6 +227,7 @@
 	flex-direction: column;
 	justify-content: space-between;
 	padding: var(--spacing-8);
+	gap: var(--spacing-6);
 }
 .checkout-preview :where(th, td) {
 	border-top: 1px solid var(--color-border);
