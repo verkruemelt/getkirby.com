@@ -15,6 +15,10 @@ body:has(.dialog[open]) {
 	overflow: hidden;
 }
 
+.dialog-form {
+	position: relative;
+}
+
 .dialog-form .field+.field {
 	margin-top: var(--spacing-6);
 }
@@ -25,14 +29,14 @@ body:has(.dialog[open]) {
 	margin-bottom: var(--spacing-2);
 }
 
-.dialog-form .label abbr {
+.dialog-form label abbr {
 	text-decoration: none;
-	color: var(--color-red-500);
+	color: var(--color-red-600);
 	margin-left: .125rem;
 	display: none;
 }
 
-.dialog-form .field:has(*:invalid) .label abbr {
+.dialog-form .field:has(*:invalid) label abbr {
 	display: inline;
 }
 

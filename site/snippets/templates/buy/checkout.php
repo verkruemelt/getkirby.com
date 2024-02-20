@@ -1,13 +1,13 @@
-<dialog class="dialog checkout" @click="closeCheckout">
+<dialog id="checkout" class="dialog checkout" :data-loading="isFetchingPrices" @click="closeCheckout">
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
 		<div class="checkout-preview">
-			<div class="mb-12">
+			<div class="mb-6">
 				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
 						<th>
 							<div class="inputs">
-								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
+								<input type="number" name="quantity" value="1" required min="<?= option('buy.quantities.min') ?>" max="<?= option('buy.quantities.max') ?>" step="1" v-model="quantity" @input="restrictQuantity">
 								<select required name="product" v-model="product" value="<?= $basic->value() ?>">
 									<option value="<?= $basic->value() ?>" selected>Kirby <?= $basic->label() ?></option>
 									<option value="<?= $enterprise->value() ?>">Kirby <?= $enterprise->label() ?></option>
@@ -29,15 +29,15 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr class="subtotal" v-if="vatRate > 0">
+					<tr class="subtotal" v-if="locale.vatRate > 0">
 						<th>
 							Subtotal
 						</th>
 						<td>{{ amount(subtotal) }}</td>
 					</tr>
-					<tr v-if="vatRate > 0">
+					<tr v-if="locale.vatRate > 0">
 						<th>
-							VAT ({{ vatIdExists ? 0 : vatRate }}%)
+							VAT ({{ vatIdExists ? 0 : locale.vatRate * 100 }}%)
 						</th>
 						<td>{{ amount(vatAmount) }}</td>
 					</tr>
@@ -50,92 +50,107 @@
 				</table>
 			</div>
 
+			<?php if ($donation['customerAmount'] > 0): ?>
 			<div>
-				<div class="field">
-					<h2 class="mb-1 font-bold">Support a good cause</h2>
-					<p class="mb-3 text-xs color-gray-700">
-						For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
-						<a class="link white" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
-					</p>
-					<label class="checkbox">
-						<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
-						<span>Match our donation 💛</span>
-					</label>
-				</div>
-			</div>
-		</div>
-		<div class="checkout-form">
-			<div class="field">
-				<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
-				<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
-			</div>
-
-			<div class="country">
-				<div class="field flex-grow">
-					<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
-					<select id="country" name="country" required autocomplete="country" class="input" v-model="country">
-						<?php foreach ($countries as $countryCode => $countryName): ?>
-						<option value="<?= $countryCode ?>"><?= $countryName ?></option>
-						<?php endforeach ?>
-					</select>
-				</div>
-				<div v-if="needsPostalCode" class="field" style="flex-basis: 7rem">
-					<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
-					<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
-				</div>
-			</div>
-			<div class="field">
-				<label class="label" for="vatId">VAT ID</label>
-				<input id="vatId" name="vatId" class="input" type="text" v-model="personalInfo.vatId">
-				<p v-if="vatIdExists" class="color-gray-700 text-xs pt-1">Your VAT ID will be validated on checkout</p>
-			</div>
-
-			<fieldset v-if="vatIdExists">
-				<div class="field">
-					<label class="label" for="company">Company Name <abbr title="Required">*</abbr></label>
-					<input id="company" name="company" autocomplete="organization" class="input" type="text" v-model="personalInfo.company" :required="vatIdExists">
-				</div>
-
-				<div class="field">
-					<label class="label" for="street">Street <abbr title="Required">*</abbr></label>
-					<input id="street" name="street" class="input" type="text" v-model="personalInfo.street" :required="vatIdExists">
-				</div>
-
-				<div class="field">
-					<label class="label" for="city">Town/City <abbr title="Required">*</abbr></label>
-					<input id="city" name="city" class="input" type="text" v-model="personalInfo.city" :required="vatIdExists">
-				</div>
-
-				<div class="field">
-					<label class="label" for="state">State/County <abbr title="Required">*</abbr></label>
-					<input id="state" name="state" class="input" type="text" v-model="personalInfo.state" :required="vatIdExists">
-				</div>
-			</fieldset>
-
-			<div class="field">
-				<label class="label" for="newsletter">Newsletter</label>
-				<label class="checkbox">
-					<input id="newsletter" type="checkbox" name="newsletter" v-model="personalInfo.newsletter">
-					Subscribe to our Kosmos newsletter
+				<label class="font-bold flex items-center" style="gap: var(--spacing-2)">
+					<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
+					<?php if ($donation['customerAmount'] === $donation['teamAmount']): ?>
+					Match our donation 💛
+					<?php else: ?>
+					Support a good cause
+					<?php endif ?>
 				</label>
-				<p class="color-gray-700 text-xs pt-1">We won't ever spam you! You can unsubscribe at any time. <a class="underline" target="_blank" href="<?= url('kosmos') ?>">Learn more about Kosmos…</a></p>
-			</div>
+				<p class="help">
+					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="locale.currency !== '€'" v-text="' (~ ' + locale.currency + locale.prices.donation.team + ')'"></span> to
+					<a class="underline" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
 
-			<div v-if="product === '<?= $basic->value() ?>'" class="field">
-				<label class="label" for="limit">Revenue limit</label>
-				<label class="checkbox">
-					<input id="limit" type="checkbox" name="limit" v-model="personalInfo.limit" required>
-					<span>I accept the license terms</span>
-				</label>
-				<p class="text-xs color-gray-700 pt-1">
-					The basic license must not be used for companies and organisations that exceed the revenue/funding limit of €1M per year.
+					<?php if ($donation['customerAmount'] !== $donation['teamAmount']): ?>
+					<span v-text="donationText" class="block color-black pt-3">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
+					<?php endif ?>
 				</p>
 			</div>
+			<?php endif ?>
+		</div>
+		<div class="checkout-form">
+			<div>
+				<div class="field">
+					<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
+					<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
+				</div>
+				<div class="checkout-country">
+					<div class="field flex-grow">
+						<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
+						<select id="country" name="country" required autocomplete="country" class="input" v-model="personalInfo.country" @change="changeCountry">
+							<?php foreach ($countries as $countryCode => $countryName): ?>
+							<option value="<?= $countryCode ?>"><?= $countryName ?></option>
+							<?php endforeach ?>
+						</select>
+					</div>
+					<div v-if="needsPostalCode" class="field" style="flex-basis: 7rem">
+						<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
+						<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
+					</div>
+				</div>
 
+				<fieldset class="checkout-company" v-if="locale.vatRate > 0">
+					<legend>Company</legend>
+					<div class="fields">
+						<div class="field">
+							<label class="label" for="vatId">VAT ID</label>
+							<input id="vatId" name="vatId" class="input" type="text" v-model="personalInfo.vatId">
+						</div>
+
+						<div class="field" v-if="vatIdExists">
+							<label class="label" for="company">Company <abbr title="Required">*</abbr></label>
+							<input id="company" name="company" placeholder="Company name …" autocomplete="organization" class="input" type="text" v-model="personalInfo.company" :required="vatIdExists">
+						</div>
+
+						<div class="field" v-if="vatIdExists">
+							<label class="label" for="street">Street <abbr title="Required">*</abbr></label>
+							<input id="street" name="street" class="input" type="text" v-model="personalInfo.street" :required="vatIdExists">
+						</div>
+
+						<div class="field" v-if="vatIdExists">
+							<label class="label" for="city">Town/City <abbr title="Required">*</abbr></label>
+							<input id="city" name="city" class="input" type="text" v-model="personalInfo.city" :required="vatIdExists">
+						</div>
+
+						<div class="field" v-if="vatIdExists">
+							<label class="label" for="state">State/County <abbr title="Required">*</abbr></label>
+							<input id="state" name="state" class="input" type="text" v-model="personalInfo.state" :required="vatIdExists">
+						</div>
+					</div>
+					<p v-if="vatIdExists" class="help">Your VAT ID and company details will be validated on&nbsp;checkout.</p>
+				</fieldset>
+
+				<div class="field">
+					<label class="font-bold flex items-center" style="gap: var(--spacing-2)">
+						<input id="newsletter" type="checkbox" name="newsletter" v-model="personalInfo.newsletter">
+						Subscribe to our Kosmos newsletter
+					</label>
+					<p class="help">We won't ever spam you! You can unsubscribe at any time. <a class="underline" target="_blank" href="<?= url('kosmos') ?>">Learn more about Kosmos…</a></p>
+				</div>
+
+				<div v-if="product === '<?= $basic->value() ?>'" class="field">
+					<label class="font-bold flex items-center" style="gap: var(--spacing-2)">
+						<input id="limit" type="checkbox" name="limit" required>
+						<span>Confirm the revenue limit <abbr title="Required">*</abbr></span>
+					</label>
+					<p class="help">
+						The basic license must not be used for organisations that exceed the revenue/funding limit of €1M per year.
+						<button type="button" class="underline" @click="product = '<?= $enterprise->value() ?>'">Switch to enterprise</button> to remove the revenue limit.
+					</p>
+				</div>
+			</div>
 			<div class="buttons">
 				<button type="submit" class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
 			</div>
 		</div>
+
+		<p class="checkout-loader" v-if="isFetchingPrices">
+			<?= icon('loader') ?>
+		</p>
+
 	</form>
 </dialog>
 
@@ -150,6 +165,31 @@
 	}
 }
 
+.dialog[data-loading="true"] {
+	pointer-events: none;
+}
+
+.checkout-loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255,255,255,.7);
+}
+.checkout-loader svg {
+	animation: Spin 1.5s linear infinite;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+@keyframes Spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
 .checkout-preview {
 	grid-area: preview;
 	background: var(--color-white);
@@ -158,10 +198,18 @@
 .checkout-form {
 	grid-area: form;
 	padding: var(--spacing-8);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
-.checkout fieldset {
-	margin-block: var(--spacing-6);
+.checkout .help {
+	font-size: var(--text-xs);
+	padding-top: var(--spacing-1);
+	color: var(--color-gray-700);
+}
+.checkout .help:hover {
+	color: var(--color-gray-900);
 }
 .checkout .buttons {
 	margin-top: var(--spacing-8);
@@ -176,6 +224,7 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	gap: 3rem;
 	padding: var(--spacing-8);
 }
 .checkout-preview :where(th, td) {
@@ -208,17 +257,16 @@
 }
 .checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
-	border-bottom: 2px solid var(--color-border);
 }
 
-.country {
+.checkout-country {
 	display: flex;
 	align-items: center;
 	margin-top: var(--spacing-6);
 	margin-bottom: var(--spacing-6);
-	gap: var(--spacing-6);
+	gap: var(--spacing-2);
 }
-.country .field {
+.checkout-country .field {
 	margin-top: 0 !important;
 }
 
@@ -226,8 +274,50 @@
 	background: var(--color-purple-400) !important;
 	border-color: var(--color-purple-400);
 	color: var(--color-purple-900) !important;
+	box-shadow: var(--shadow);
 }
 .checkout .btn.btn--filled svg {
 	color: var(--color-purple-800) !important;
 }
+
+.checkout-company {
+	margin-top: var(--spacing-6);
+	margin-bottom: var(--spacing-6);
+}
+.checkout-company legend {
+	font-weight: var(--font-bold);
+	margin-bottom: var(--spacing-2);
+}
+.checkout-company .fields {
+	border: 1px solid var(--color-border);
+	border-radius: var(--rounded);
+	overflow: clip;
+}
+.checkout-company .field {
+	display: grid;
+	grid-template-columns: 6.75rem 1fr;
+	background: var(--color-white);
+	align-items: center;
+}
+.checkout-company .field + .field {
+	margin-top: 0;
+	border-top: 1px solid var(--color-border);
+}
+.checkout-company .label {
+	display: flex;
+	align-items: center;
+	height: 2.25rem;
+	font-weight: var(--font-normal);
+	margin-bottom: 0;
+	white-space: nowrap;
+	background: var(--color-gray-100);
+	padding: var(--spacing-2);
+	border-right: 1px solid var(--color-border);
+	color: var(--color-gray-800);
+}
+.checkout-company .field .input {
+	box-shadow: none;
+	outline-offset: -2px;
+}
+
 </style>

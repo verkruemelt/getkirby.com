@@ -50,12 +50,9 @@ return [
 	[
 		'pattern' => 'buy/prices',
 		'action' => function () {
-			// uncomment to test a specific country
-			// Buy\Paddle::visitor(country: 'US');
-
 			$basic      = Product::Basic;
 			$enterprise = Product::Enterprise;
-			$visitor    = Paddle::visitor();
+			$visitor    = Paddle::visitor(country: get('country'));
 
 			return json_encode([
 				'status'   => $visitor->error() ?? 'OK',

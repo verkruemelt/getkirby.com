@@ -82,7 +82,7 @@
 	font-size: var(--text-xl);
 }
 
-[data-loading] .price[data-sale] {
+article[data-loading] .price[data-sale] {
 	color: var(--color-gray-600)
 }
 
@@ -372,6 +372,7 @@ createApp({
 	},
 
 	// dynamic props
+	isFetchingPrices: false,
 	product: "basic",
 	quantity: 1,
 
@@ -415,7 +416,7 @@ createApp({
 		return this.subtotal * rate;
 	},
 	get vatIdExists() {
-		return this.personalInfo.vatId?.length > 0;
+		return this.locale.vatRate > 0 && this.personalInfo.vatId?.length > 0;
 	},
 
 	// methods
@@ -437,20 +438,37 @@ createApp({
 	cachePersonalInfo() {
 		window.localStorage.setItem("buy.personalInfo", JSON.stringify(this.personalInfo));
 	},
+	async changeCountry(event) {
+		this.locale               = await this.fetchPrices(this.personalInfo.country);
+		this.personalInfo.country = this.locale.country;
+	},
 	closeCheckout(event) {
 		if (event.target === checkout) {
 			checkout.close();
 		}
 	},
-	async mounted() {
+	async fetchPrices(country = '') {
+		if (this.isFetchingPrices === true) {
+			return;
+		}
+
+		this.isFetchingPrices = true;
+
 		// fetch prices with options that allow using the preloaded response
-		const response = await fetch("/buy/prices", {
+		const response = await fetch("/buy/prices?" + new URLSearchParams({
+			country: country,
+		}), {
 			method: "GET",
 			credentials: "include",
 			mode: "no-cors",
 		});
 
-		this.locale               = await response.json();
+		this.isFetchingPrices = false;
+
+		return await response.json();
+	},
+	async mounted() {
+		this.locale               = await this.fetchPrices();
 		this.personalInfo.country = this.locale.country;
 
 		// load the personal info from the last purchase if available
