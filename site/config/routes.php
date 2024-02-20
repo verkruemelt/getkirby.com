@@ -95,6 +95,9 @@ return [
 			$vatId      = get('vatId');
 
 			try {
+				// use the provided country for the calculation, not the IP address
+				Paddle::visitor(country: $country);
+
 				$product     = Product::from($productId);
 				$price       = $product->price();
 				$message     = $product->revenueLimit();
