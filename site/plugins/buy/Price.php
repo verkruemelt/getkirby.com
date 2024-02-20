@@ -95,16 +95,23 @@ class Price
 		// on the second-last place
 		$rounded = round($price / 5 / $step) * 5 * $step;
 
+		// if that brought us to zero, round by one place fewer
+		if ($rounded < 1 && $step >= 10) {
+			$step /= 10;
+			$rounded = round($price / 5 / $step) * 5 * $step;
+		}
+
 		if ($rounded % max($step, 10) === 0) {
 			$rounded -= 1;
 		}
 
-		// ensure that the price is never rounded to zero
+		// fall back to the original price if we ended up at zero
+		// (relevant for currencies with `$step = 1`)
 		if ($rounded < 1) {
 			return round($price);
 		}
 
-		return max(0, $rounded);
+		return $rounded;
 	}
 
 	/**
