@@ -15,6 +15,10 @@ return [
 		'end'      => '2023-12-18',
 		'discount' => 20
 	],
+	'quantities' => [
+		'min' => 1,
+		'max' => 100,
+	],
 	'volume' => [
 		5  => 5,
 		10 => 10,

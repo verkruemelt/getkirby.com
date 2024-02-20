@@ -61,6 +61,15 @@ enum Product: string
 	}
 
 	/**
+	 * Ensures that the quantity is in the valid range
+	 */
+	public static function restrictQuantity(int $quantity): int
+	{
+		$quantity = max($quantity, option('buy.quantities.min'));
+		return min($quantity, option('buy.quantities.max'));
+	}
+
+	/**
 	 * Returns a label for the revenue limit
 	 */
 	public function revenueLimit(): string|null

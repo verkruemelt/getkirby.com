@@ -94,7 +94,7 @@ return [
 			$postalCode = get('postalCode');
 			$state      = get('state');
 			$street     = get('street');
-			$quantity   = (int)get('quantity', 1);
+			$quantity   = Product::restrictQuantity(get('quantity', 1));
 			$vatId      = get('vatId');
 
 			try {
@@ -173,7 +173,7 @@ return [
 		'method'  => 'POST',
 		'action'  => function () {
 			$productId = get('product', 'basic');
-			$quantity  = (int)get('volume', 5);
+			$quantity  = Product::restrictQuantity(get('volume', 5));
 
 			try {
 				$product     = Product::from($productId);
@@ -197,6 +197,8 @@ return [
 	[
 		'pattern' => 'buy/volume/(enterprise|basic)/(:num)',
 		'action'  => function (string $productId, int $quantity) {
+			$quantity = Product::restrictQuantity($quantity);
+
 			try {
 				$product     = Product::from($productId);
 				$price       = $product->price();
