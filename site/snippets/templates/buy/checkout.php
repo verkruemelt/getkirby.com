@@ -226,7 +226,6 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	gap: 3rem;
 	padding: var(--spacing-8);
 }
 .checkout-preview :where(th, td) {
