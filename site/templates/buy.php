@@ -447,17 +447,19 @@ createApp({
 			checkout.close();
 		}
 	},
-	async fetchPrices(country = '') {
+	async fetchPrices(country) {
 		if (this.isFetchingPrices === true) {
 			return;
 		}
 
 		this.isFetchingPrices = true;
 
-		// fetch prices with options that allow using the preloaded response
-		const response = await fetch("/buy/prices?" + new URLSearchParams({
+		const query = country ? "?" + new URLSearchParams({
 			country: country,
-		}), {
+		}) : "";
+
+		// fetch prices with options that allow using the preloaded response
+		const response = await fetch("/buy/prices" + query, {
 			method: "GET",
 			credentials: "include",
 			mode: "no-cors",
