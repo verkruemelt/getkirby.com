@@ -137,8 +137,10 @@
 						<span>Confirm the revenue limit <abbr title="Required">*</abbr></span>
 					</label>
 					<p class="help">
-						The basic license must not be used for organisations that exceed the revenue/funding limit of €1M per year.
-						<button type="button" class="underline" @click="product = '<?= $enterprise->value() ?>'">Switch to enterprise</button> to remove the revenue limit.
+						End customers must not exceed an annual revenue/funding of
+						<strong><?= $revenueLimitVerbose ?><span v-if="locale.revenueLimit.length" v-text="locale.revenueLimit"></span></strong>
+						to be eligible for this license.
+						<button type="button" class="underline" @click="product = '<?= $enterprise->value() ?>'">Switch to Enterprise</button> to remove the revenue limit.
 					</p>
 				</div>
 			</div>
