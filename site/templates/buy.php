@@ -470,14 +470,14 @@ createApp({
 		return await response.json();
 	},
 	async mounted() {
-		this.locale               = await this.fetchPrices();
-		this.personalInfo.country = this.locale.country;
-
 		// load the personal info from the last purchase if available
 		const personalInfo = window.localStorage.getItem("buy.personalInfo");
 		if (personalInfo) {
 			this.personalInfo = JSON.parse(personalInfo);
 		}
+
+		this.locale               = await this.fetchPrices(this.personalInfo.country);
+		this.personalInfo.country = this.locale.country;
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
 	},
