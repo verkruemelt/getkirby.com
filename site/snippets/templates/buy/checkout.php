@@ -1,13 +1,13 @@
 <dialog class="dialog checkout" @click="closeCheckout">
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
 		<div class="checkout-preview">
-			<div>
+			<div class="mb-12">
 				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
 						<th>
 							<div class="inputs">
-								<input type="number" name="quantity" value="1" required min="<?= option('buy.quantities.min') ?>" max="<?= option('buy.quantities.max') ?>" step="1" v-model="quantity" @input="restrictQuantity">
+								<input type="number" name="quantity" value="1" required min="1" max="100" step="1" v-model="quantity">
 								<select required name="product" v-model="product" value="<?= $basic->value() ?>">
 									<option value="<?= $basic->value() ?>" selected>Kirby <?= $basic->label() ?></option>
 									<option value="<?= $enterprise->value() ?>">Kirby <?= $enterprise->label() ?></option>
@@ -19,7 +19,7 @@
 					<tr v-if="discountRate">
 						<th>
 							<p>Volume Discount (-{{ discountRate }}%)</p>
-							<p v-if="quantity >= 50" class="text-xs color-gray-700">Please <a class="underline" href="mailto:support@getkirby.com">contact us</a> for <span class="whitespace-nowrap">high-volume</span> discounts</p>
+							<p v-if="quantity >= 50" class="text-xs color-gray-700">Please, <a class="underline" href="mailto:support@getkirby.com">contact us</a> for <span class="whitespace-nowrap">high-volume</span> discounts</p>
 						</th>
 						<td>{{ amount(discountAmount) }}</td>
 					</tr>
@@ -29,15 +29,15 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr class="subtotal" v-if="locale.vatRate > 0">
+					<tr class="subtotal" v-if="vatRate > 0">
 						<th>
 							Subtotal
 						</th>
 						<td>{{ amount(subtotal) }}</td>
 					</tr>
-					<tr v-if="locale.vatRate > 0">
+					<tr v-if="vatRate > 0">
 						<th>
-							VAT ({{ vatIdExists ? 0 : locale.vatRate * 100 }}%)
+							VAT ({{ vatIdExists ? 0 : vatRate }}%)
 						</th>
 						<td>{{ amount(vatAmount) }}</td>
 					</tr>
@@ -50,40 +50,39 @@
 				</table>
 			</div>
 
-			<?php if ($donation['customerAmount'] > 0): ?>
 			<div>
-				<h2 for="donate" class="font-bold">Support a good cause</h2>
-				<p class="mb-3">
-					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="locale.currency !== '€'" v-text="' (~ ' + locale.currency + locale.prices.donation.team + ')'"></span> to
-					<a class="link" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
-				</p>
-				<label class="checkbox">
-					<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
-					<?php if ($donation['customerAmount'] === $donation['teamAmount']): ?>
-					Match our donation 💛
-					<?php else: ?>
-					<span v-text="donationText">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
-					<?php endif ?>
-				</label>
+				<div class="field">
+					<h2 class="mb-1 font-bold">Support a good cause</h2>
+					<p class="mb-3 text-xs color-gray-700">
+						For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="currencySign !== '€'" v-text="' (~ ' + currencySign + prices.donation.team + ')'"></span> to
+						<a class="link white" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
+					</p>
+					<label class="checkbox">
+						<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
+						<span>Match our donation 💛</span>
+					</label>
+				</div>
 			</div>
-			<?php endif ?>
 		</div>
 		<div class="checkout-form">
 			<div class="field">
 				<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
 				<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
 			</div>
-			<div class="field">
-				<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
-				<select id="country" name="country" required autocomplete="country" class="input" v-model="personalInfo.country">
-					<?php foreach ($countries as $countryCode => $countryName): ?>
-					<option value="<?= $countryCode ?>"><?= $countryName ?></option>
-					<?php endforeach ?>
-				</select>
-			</div>
-			<div v-if="needsPostalCode" class="field">
-				<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
-				<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
+
+			<div class="country">
+				<div class="field flex-grow">
+					<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
+					<select id="country" name="country" required autocomplete="country" class="input" v-model="country">
+						<?php foreach ($countries as $countryCode => $countryName): ?>
+						<option value="<?= $countryCode ?>"><?= $countryName ?></option>
+						<?php endforeach ?>
+					</select>
+				</div>
+				<div v-if="needsPostalCode" class="field" style="flex-basis: 7rem">
+					<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
+					<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
+				</div>
 			</div>
 			<div class="field">
 				<label class="label" for="vatId">VAT ID</label>
@@ -120,6 +119,17 @@
 					Subscribe to our Kosmos newsletter
 				</label>
 				<p class="color-gray-700 text-xs pt-1">We won't ever spam you! You can unsubscribe at any time. <a class="underline" target="_blank" href="<?= url('kosmos') ?>">Learn more about Kosmos…</a></p>
+			</div>
+
+			<div v-if="product === '<?= $basic->value() ?>'" class="field">
+				<label class="label" for="limit">Revenue limit</label>
+				<label class="checkbox">
+					<input id="limit" type="checkbox" name="limit" v-model="personalInfo.limit">
+					<span>I accept the license terms</span>
+				</label>
+				<p class="text-xs color-gray-700 pt-1">
+					The basic license must not be used for companies and organisations that exceed the revenue/funding limit of €1M per year.
+				</p>
 			</div>
 
 			<div class="buttons">
@@ -166,7 +176,6 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	gap: 3rem;
 	padding: var(--spacing-8);
 }
 .checkout-preview :where(th, td) {
@@ -199,5 +208,26 @@
 }
 .checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
+	border-bottom: 2px solid var(--color-border);
+}
+
+.country {
+	display: flex;
+	align-items: center;
+	margin-top: var(--spacing-6);
+	margin-bottom: var(--spacing-6);
+	gap: var(--spacing-6);
+}
+.country .field {
+	margin-top: 0 !important;
+}
+
+.checkout .btn.btn--filled {
+	background: var(--color-purple-400) !important;
+	border-color: var(--color-purple-400);
+	color: var(--color-purple-900) !important;
+}
+.checkout .btn.btn--filled svg {
+	color: var(--color-purple-800) !important;
 }
 </style>
