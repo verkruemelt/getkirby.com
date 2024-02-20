@@ -124,7 +124,7 @@
 			<div v-if="product === '<?= $basic->value() ?>'" class="field">
 				<label class="label" for="limit">Revenue limit</label>
 				<label class="checkbox">
-					<input id="limit" type="checkbox" name="limit" v-model="personalInfo.limit">
+					<input id="limit" type="checkbox" name="limit" v-model="personalInfo.limit" required>
 					<span>I accept the license terms</span>
 				</label>
 				<p class="text-xs color-gray-700 pt-1">

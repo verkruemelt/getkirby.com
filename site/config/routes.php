@@ -89,8 +89,8 @@ return [
 			$country    = get('country');
 			$donate     = get('donate') === 'on';
 			$email      = get('email');
-			$productId  = get('product');
 			$newsletter = get('newsletter') === 'on';
+			$productId  = get('product');
 			$postalCode = get('postalCode');
 			$state      = get('state');
 			$street     = get('street');
