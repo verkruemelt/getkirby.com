@@ -492,10 +492,14 @@ createApp({
 		this.quantity = quantity;
 		this.checkoutIsOpen = true;
 
+		window.scrollTo({
+			top: 200,
+			behavior: "smooth",
+		});
+
 		await this.$nextTick();
 
-		document.querySelector("input[name=email]").focus();
-
+		document.querySelector("input[name=email]").focus({ preventScroll: true });
 	},
 	restrictQuantity(event) {
 		// allow an empty input...
