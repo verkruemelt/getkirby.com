@@ -318,8 +318,10 @@ document.addEventListener("click", (event) => {
 	}
 });
 
+// access the dialog
 const checkout = document.querySelector(".checkout");
 
+// countries which require a postal code
 const postalCodeCountries = [
 	"AU",
 	"CA",
@@ -332,6 +334,11 @@ const postalCodeCountries = [
 	"GB",
 	"US"
 ];
+
+// close the dialog when the page is being left
+window.addEventListener("unload", () => {
+	checkout.close();
+});
 
 createApp({
 	// props dynamically populated by the backend
@@ -373,6 +380,7 @@ createApp({
 
 	// dynamic props
 	isFetchingPrices: false,
+	isProcessing: false,
 	product: "basic",
 	quantity: 1,
 
@@ -493,5 +501,9 @@ createApp({
 			this.quantity = Math.max(Math.min(this.quantity, event.target.max), event.target.min);
 		}
 	},
+	submit() {
+		this.isProcessing = true;
+		this.cachePersonalInfo();
+	}
 }).mount();
 </script>

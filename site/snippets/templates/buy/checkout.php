@@ -1,5 +1,5 @@
-<dialog id="checkout" class="dialog checkout" :data-loading="isFetchingPrices" @click="closeCheckout">
-	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" target="_blank" @submit="cachePersonalInfo">
+<dialog id="checkout" class="dialog checkout" @click="closeCheckout" :inert="isFetchingPrices || isProcessing" @close="isProcessing = false">
+	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" @submit="submit">
 		<div class="checkout-preview">
 			<div>
 				<h2 class="label">Your order</h2>
@@ -142,7 +142,9 @@
 				</div>
 			</div>
 			<div class="buttons">
-				<button type="submit" class="btn btn--filled"><?= icon('cart') ?> Checkout</button>
+				<button type="submit" class="btn btn--filled">
+					<span v-if="isProcessing"><?= icon('loader') ?></span><span v-else><?= icon('cart') ?></span> Checkout
+				</button>
 			</div>
 		</div>
 
@@ -164,23 +166,19 @@
 	}
 }
 
-.dialog[data-loading="true"] {
-	pointer-events: none;
-}
-
 .checkout-loader {
 	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	background: rgba(255,255,255,.7);
 }
-.checkout-loader svg {
+svg[data-type="loader"] {
 	animation: Spin 1.5s linear infinite;
-	position: absolute;
-	top: 50%;
-	left: 50%;
 }
 
 @keyframes Spin {
