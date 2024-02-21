@@ -109,7 +109,6 @@ article[data-loading] .price[data-sale] {
 <article v-scope data-loading @mounted="mounted">
 
 	<div class="mb-42" v-cloak v-if="checkout">
-		<h1 class="h1 mb-6">Your order</h1>
 		<?php snippet('templates/buy/checkout') ?>
 		<p class="text-xs text-center mb-6 color-gray-700 pt-6">With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
 

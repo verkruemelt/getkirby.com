@@ -2,6 +2,7 @@
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" @submit="submit">
 		<div class="checkout-preview">
 			<div>
+				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
 						<th>
@@ -240,11 +241,10 @@ svg[data-type="loader"] {
 	justify-content: space-between;
 	padding: var(--spacing-8);
 	gap: var(--spacing-6);
-	padding-top: calc(1.375rem + 2px);
 }
 
 .checkout-preview :where(th, td) {
-	border-bottom: 1px solid var(--color-border);
+	border-top: 1px solid var(--color-border);
 	height: calc(2.25rem + 1px);
 	padding: .425rem 0;
 }
@@ -270,7 +270,7 @@ svg[data-type="loader"] {
 	text-align: right;
 }
 .checkout-preview :where(tr.total, tr.subtotal) > * {
-	border-bottom-width: 2px;
+	border-top-width: 2px;
 }
 .checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
