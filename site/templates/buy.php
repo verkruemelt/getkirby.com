@@ -495,7 +495,7 @@ createApp({
 		await this.$nextTick();
 
 		window.scrollTo({
-			top: 200,
+			top: 250,
 			behavior: "smooth",
 		});
 
