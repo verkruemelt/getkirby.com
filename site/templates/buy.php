@@ -105,13 +105,10 @@ article[data-loading] .price[data-sale] {
 }
 </style>
 
-
 <article v-scope data-loading @mounted="mounted">
-
 	<div class="mb-42" v-cloak v-if="checkout">
 		<?php snippet('templates/buy/checkout') ?>
 		<p class="text-xs text-center mb-6 color-gray-700 pt-6">With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
-
 	</div>
 
 	<div v-else>
@@ -256,59 +253,56 @@ article[data-loading] .price[data-sale] {
 				</div>
 			</form>
 		</section>
-
 	</div>
 
-		<section class="mb-42 columns columns--reverse" style="--columns: 2; --columns-md: 1; --gap: var(--spacing-36)">
-			<div>
-
-				<h2 class="h2 mb-6">For a good cause? <mark class="px-1 rounded">It’s free.</mark></h2>
-				<div class="prose mb-6">
-					<p>We care about a better society and the future of our planet. We offer free&nbsp;licenses for <strong>students, selected educational projects, social and environmental organizations, charities and non-profits</strong> with insufficient funding.</p>
-				</div>
-
-				<a class="btn btn--filled mb-12" href="mailto:support@getkirby.com">
-					<?= icon('heart') ?>
-					Contact us
-				</a>
-
-				<ul class="columns causes" style="--columns: 2; --gap: var(--spacing-12);">
-					<?php foreach (collection('causes')->shuffle()->limit(2) as $case) : ?>
-						<li>
-							<a href="<?= $case->link()->toUrl() ?>">
-								<figure>
-									<span class="block shadow-2xl mb-3" style="--aspect-ratio: 3/4">
-										<?= img($image = $case->image(), [
-											'alt' => 'Screenshot of the ' . $image->alt() . ' website',
-											'src' => [
-												'width' => 300
-											],
-											'srcset' => [
-												'1x' => 400,
-												'2x' => 800,
-											]
-										]) ?>
-									</span>
-									<figcaption class="text-sm">
-										<?= $case->title() ?>
-									</figcaption>
-								</figure>
-							</a>
-						</li>
-					<?php endforeach ?>
-				</ul>
+	<section class="mb-42 columns columns--reverse" style="--columns: 2; --columns-md: 1; --gap: var(--spacing-36)">
+		<div>
+			<h2 class="h2 mb-6">For a good cause? <mark class="px-1 rounded">It’s free.</mark></h2>
+			<div class="prose mb-6">
+				<p>We care about a better society and the future of our planet. We offer free&nbsp;licenses for <strong>students, selected educational projects, social and environmental organizations, charities and non-profits</strong> with insufficient funding.</p>
 			</div>
 
-			<div>
-				<h2 class="h2 mb-6">Frequently asked questions</h2>
-				<?php snippet('faq') ?>
-			</div>
-		</section>
+			<a class="btn btn--filled mb-12" href="mailto:support@getkirby.com">
+				<?= icon('heart') ?>
+				Contact us
+			</a>
 
-		<footer class="h2">
-			Manage your existing licenses in our <a href="https://hub.getkirby.com"><span class="link">license&nbsp;hub</span> &rarr;</a>
-		</footer>
+			<ul class="columns causes" style="--columns: 2; --gap: var(--spacing-12);">
+				<?php foreach (collection('causes')->shuffle()->limit(2) as $case) : ?>
+					<li>
+						<a href="<?= $case->link()->toUrl() ?>">
+							<figure>
+								<span class="block shadow-2xl mb-3" style="--aspect-ratio: 3/4">
+									<?= img($image = $case->image(), [
+										'alt' => 'Screenshot of the ' . $image->alt() . ' website',
+										'src' => [
+											'width' => 300
+										],
+										'srcset' => [
+											'1x' => 400,
+											'2x' => 800,
+										]
+									]) ?>
+								</span>
+								<figcaption class="text-sm">
+									<?= $case->title() ?>
+								</figcaption>
+							</figure>
+						</a>
+					</li>
+				<?php endforeach ?>
+			</ul>
+		</div>
 
+		<div>
+			<h2 class="h2 mb-6">Frequently asked questions</h2>
+			<?php snippet('faq') ?>
+		</div>
+	</section>
+
+	<footer class="h2">
+		Manage your existing licenses in our <a href="https://hub.getkirby.com"><span class="link">license&nbsp;hub</span> &rarr;</a>
+	</footer>
 </article>
 
 <script type="module">
@@ -344,8 +338,6 @@ const postalCodeCountries = [
 ];
 
 createApp({
-	checkout: false,
-
 	// props dynamically populated by the backend
 	locale: {
 		country: "",
@@ -384,6 +376,7 @@ createApp({
 	},
 
 	// dynamic props
+	checkout: false,
 	isFetchingPrices: false,
 	isProcessing: false,
 	product: "basic",

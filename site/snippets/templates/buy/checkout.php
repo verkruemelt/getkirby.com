@@ -360,6 +360,6 @@ svg[data-type="loader"] {
 }
 
 [v-cloak] {
-  display: none;
+	display: none;
 }
 </style>
