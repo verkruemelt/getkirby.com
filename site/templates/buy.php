@@ -492,12 +492,12 @@ createApp({
 		this.quantity = quantity;
 		this.checkoutIsOpen = true;
 
+		await this.$nextTick();
+
 		window.scrollTo({
 			top: 200,
 			behavior: "smooth",
 		});
-
-		await this.$nextTick();
 
 		document.querySelector("input[name=email]").focus({ preventScroll: true });
 	},
