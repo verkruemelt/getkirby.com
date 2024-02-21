@@ -29,12 +29,6 @@
 						</th>
 						<td>{{ amount(donationAmount) }}</td>
 					</tr>
-					<tr class="subtotal" v-if="locale.vatRate > 0">
-						<th>
-							Subtotal
-						</th>
-						<td>{{ amount(subtotal) }}</td>
-					</tr>
 					<tr v-if="locale.vatRate > 0">
 						<th>
 							VAT ({{ vatIdExists ? 0 : locale.vatRate * 100 }}%)
@@ -269,10 +263,8 @@ svg[data-type="loader"] {
 .checkout-preview td {
 	text-align: right;
 }
-.checkout-preview :where(tr.total, tr.subtotal) > * {
-	border-top-width: 2px;
-}
 .checkout-preview tr.total > * {
+	border-top-width: 2px;
 	font-weight: var(--font-bold);
 }
 
