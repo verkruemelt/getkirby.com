@@ -210,9 +210,6 @@
 	padding-top: var(--spacing-1);
 	color: var(--color-gray-700);
 }
-.checkout .help:hover {
-	color: var(--color-gray-900);
-}
 .checkout .buttons {
 	margin-top: var(--spacing-8);
 	display: flex;
