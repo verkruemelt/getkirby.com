@@ -116,7 +116,6 @@
 							<input id="state" name="state" class="input" type="text" v-model="personalInfo.state" :required="vatIdExists">
 						</div>
 					</div>
-					<p v-if="vatIdExists" class="help">Your VAT ID and company details will be validated on&nbsp;checkout.</p>
 				</fieldset>
 
 				<div class="field">
@@ -163,7 +162,6 @@
 .checkout {
 	position: relative;
 	border-radius: var(--rounded);
-	margin-bottom: var(--spacing-42);
 	box-shadow: var(--shadow-2xl);
 	border: 1px solid var(--color-border);
 	background: var(--color-gray-200);
@@ -219,6 +217,7 @@ svg[data-type="loader"] {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	background: rgba(255,255,255, .25);
 }
 
 .checkout .help {
@@ -275,6 +274,10 @@ svg[data-type="loader"] {
 }
 .checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
+}
+
+.checkout-preview tr.total td {
+	color: var(--color-purple-600);
 }
 
 .checkout-country {
