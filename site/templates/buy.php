@@ -108,7 +108,7 @@ article[data-loading] .price[data-sale] {
 
 <article v-scope data-loading @mounted="mounted">
 
-	<div v-if="checkout">
+	<div v-cloak v-if="checkout">
 		<h1 class="h1 mb-6">Your order</h1>
 		<?php snippet('templates/buy/checkout') ?>
 	</div>
@@ -328,7 +328,6 @@ document.addEventListener("click", (event) => {
 // access the dialog
 const checkout = document.querySelector(".checkout");
 
-
 // countries which require a postal code
 const postalCodeCountries = [
 	"AU",
@@ -455,11 +454,6 @@ createApp({
 		this.locale               = await this.fetchPrices(this.personalInfo.country);
 		this.personalInfo.country = this.locale.country;
 	},
-	closeCheckout(event) {
-		if (event.target === checkout) {
-			checkout.close();
-		}
-	},
 	async fetchPrices(country) {
 		if (this.isFetchingPrices === true) {
 			return;
@@ -493,6 +487,11 @@ createApp({
 		this.personalInfo.country = this.locale.country;
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
+
+		// stop checkout processing on unload
+		window.addEventListener("pagehide", (e) => {
+			this.isProcessing = false;
+		});
 	},
 	async openCheckout(product, quantity = 1) {
 		this.product = product;

@@ -356,4 +356,7 @@ svg[data-type="loader"] {
 	color: var(--color-white);
 }
 
+[v-cloak] {
+  display: none;
+}
 </style>
