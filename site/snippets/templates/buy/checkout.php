@@ -142,7 +142,7 @@
 				</div>
 			</div>
 			<div class="buttons">
-				<button type="submit" class="btn btn--filled">
+				<button type="submit" class="btn btn--filled" :disabled="isProcessing">
 					<span v-if="isProcessing"><?= icon('loader') ?></span><span v-else><?= icon('cart') ?></span> Checkout
 				</button>
 			</div>
@@ -269,6 +269,10 @@ svg[data-type="loader"] {
 	border-color: var(--color-purple-400);
 	color: var(--color-purple-900) !important;
 	box-shadow: var(--shadow);
+}
+.checkout .btn.btn--filled[disabled] {
+	background: var(--color-purple-300) !important;
+	border-color: var(--color-purple-300);
 }
 .checkout .btn.btn--filled svg {
 	color: var(--color-purple-800) !important;
