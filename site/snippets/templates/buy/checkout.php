@@ -1,4 +1,4 @@
-<div id="checkout" class="dialog checkout">
+<div id="checkout" class="dialog checkout" :inert="isFetchingPrices || isProcessing">
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" @submit="submit">
 		<div class="checkout-preview">
 			<div>
