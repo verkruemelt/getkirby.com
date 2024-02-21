@@ -1,8 +1,7 @@
-<dialog id="checkout" class="dialog checkout" @click="closeCheckout" :inert="isFetchingPrices || isProcessing" @close="isProcessing = false">
+<div id="checkout" class="dialog checkout" @click="closeCheckout" :inert="isFetchingPrices || isProcessing" @close="isProcessing = false">
 	<form class="dialog-form" action="<?= url('buy') ?>" method="POST" @submit="submit">
 		<div class="checkout-preview">
 			<div>
-				<h2 class="label">Your order</h2>
 				<table>
 					<tr>
 						<th>
@@ -151,14 +150,36 @@
 		<p class="checkout-loader" v-if="isFetchingPrices">
 			<?= icon('loader') ?>
 		</p>
-
 	</form>
-</dialog>
+
+	<button type="reset" @click="checkout = false">
+		<?= icon('cancel-small') ?>
+	</button>
+</div>
 
 <style>
 @import url("/assets/css/site/dialog.css");
 
-@media screen and (min-width: 40rem) {
+.checkout {
+	position: relative;
+	border-radius: var(--rounded);
+	margin-bottom: var(--spacing-42);
+	box-shadow: var(--shadow-2xl);
+	border: 1px solid var(--color-border);
+	background: var(--color-gray-200);
+	font-size: var(--text-sm);
+}
+
+.checkout form {
+	border-radius: var(--rounded);
+	overflow: hidden;
+}
+
+@media screen and (min-width: 55rem) {
+	.checkout {
+		border: none;
+	}
+
 	.checkout form {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -220,10 +241,13 @@ svg[data-type="loader"] {
 	justify-content: space-between;
 	padding: var(--spacing-8);
 	gap: var(--spacing-6);
+	padding-top: calc(1.375rem + 2px);
 }
+
 .checkout-preview :where(th, td) {
-	border-top: 1px solid var(--color-border);
-	padding-block: var(--spacing-2);
+	border-bottom: 1px solid var(--color-border);
+	height: calc(2.25rem + 1px);
+	padding: .425rem 0;
 }
 .checkout-preview th {
 	font-weight: var(--font-normal);
@@ -235,19 +259,19 @@ svg[data-type="loader"] {
 }
 .checkout-preview th :where(input, select) {
 	background: var(--color-light);
-	height: 1.25rem;
+	height: 1.375rem;
 	line-height: 1.25;
-	padding-inline: var(--spacing-1);
+	padding-left: var(--spacing-1);
 	border-radius: var(--rounded);
 }
 .checkout-preview th input {
-	width: 3rem;
+	width: 4rem;
 }
 .checkout-preview td {
 	text-align: right;
 }
 .checkout-preview :where(tr.total, tr.subtotal) > * {
-	border-top-width: 2px;
+	border-bottom-width: 2px;
 }
 .checkout-preview tr.total > * {
 	font-weight: var(--font-bold);
@@ -268,14 +292,13 @@ svg[data-type="loader"] {
 	background: var(--color-purple-400) !important;
 	border-color: var(--color-purple-400);
 	color: var(--color-purple-900) !important;
-	box-shadow: var(--shadow);
 }
 .checkout .btn.btn--filled[disabled] {
 	background: var(--color-purple-300) !important;
 	border-color: var(--color-purple-300);
 }
 .checkout .btn.btn--filled svg {
-	color: var(--color-purple-800) !important;
+	color: var(--color-purple-900) !important;
 }
 
 .checkout-company {
@@ -316,6 +339,21 @@ svg[data-type="loader"] {
 .checkout-company .field .input {
 	box-shadow: none;
 	outline-offset: -2px;
+}
+
+.checkout button[type="reset"] {
+	position: absolute;
+	right: -.5rem;
+	top: -.5rem;
+	background: var(--color-black);
+	border-radius: 50%;
+	width: 1.25rem;
+	height: 1.25rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: var(--shadow);
+	color: var(--color-white);
 }
 
 </style>
