@@ -52,22 +52,19 @@
 
 			<?php if ($donation['customerAmount'] > 0): ?>
 			<div>
-				<label class="font-bold flex items-center" style="gap: var(--spacing-2)">
+				<h2 class="font-bold">Support a good cause</h2>
+				<p class="mb-3 help">
+					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="locale.currency !== '€'" v-text="' (~ ' + locale.currency + locale.prices.donation.team + ')'"></span> to
+					<a class="underline" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
+				</p>
+				<label class="checkbox">
 					<input id="donate" type="checkbox" name="donate" v-model="personalInfo.donate">
 					<?php if ($donation['customerAmount'] === $donation['teamAmount']): ?>
 					Match our donation 💛
 					<?php else: ?>
-					Support a good cause
+					<span v-text="donationText">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
 					<?php endif ?>
 				</label>
-				<p class="help">
-					For every purchased license we donate <span class="whitespace-nowrap">€<?= $donation['teamAmount'] ?></span><span class="whitespace-nowrap" v-if="locale.currency !== '€'" v-text="' (~ ' + locale.currency + locale.prices.donation.team + ')'"></span> to
-					<a class="underline" rel="noopener noreferrer" target="_blank" href="<?= $donation['link'] ?>"><?= $donation['charity'] ?></a> <?= $donation['purpose'] ?>.
-
-					<?php if ($donation['customerAmount'] !== $donation['teamAmount']): ?>
-					<span v-text="donationText" class="block color-black pt-3">Donate an additional €<?= $donation['customerAmount'] ?> per license 💛</span>
-					<?php endif ?>
-				</p>
 			</div>
 			<?php endif ?>
 		</div>
