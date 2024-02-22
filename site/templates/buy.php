@@ -95,7 +95,7 @@ article[data-loading] .price[data-sale] {
 	<?php snippet('templates/buy/checkout') ?>
 
 	<div v-else>
-		<div class="columns mb-42" style="--columns-sm: 1; --columns-md: 1; --columns-lg: 2; --gap: var(--spacing-6)">
+		<div class="columns mb-42" style="--columns-sm: 1; --columns-md: 1; --columns-lg: 2; --gap: var(--spacing-3)">
 			<div>
 				<h1 class="h1 max-w-xl mb-12">
 					The transparency of <a href="https://github.com/getkirby">open&#8209;source</a> meets a fair pricing&nbsp;model
@@ -107,7 +107,7 @@ article[data-loading] .price[data-sale] {
 					</div>
 				<?php endif ?>
 			</div>
-			<div class="columns" style="--columns: 2; --gap: var(--spacing-6)">
+			<div class="columns" style="--columns: 2; --gap: var(--spacing-3)">
 				<?php snippet('templates/buy/product', [
 					'product'     => $basic,
 					'description' => 'A discounted license for individuals, small teams and side projects',
