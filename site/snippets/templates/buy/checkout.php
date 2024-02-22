@@ -146,7 +146,7 @@
 		</p>
 	</form>
 
-	<button type="reset" @click="checkoutIsOpen = false">
+	<button type="reset" @click="closeCheckout">
 		<?= icon('cancel-small') ?>
 	</button>
 </div>

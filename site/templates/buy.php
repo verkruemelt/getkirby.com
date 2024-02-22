@@ -448,6 +448,14 @@ createApp({
 		this.locale               = await this.fetchPrices(this.personalInfo.country);
 		this.personalInfo.country = this.locale.country;
 	},
+	closeCheckout() {
+		this.checkoutIsOpen = false;
+
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth",
+		});
+	},
 	async fetchPrices(country) {
 		if (this.isFetchingPrices === true) {
 			return;
@@ -494,8 +502,10 @@ createApp({
 
 		await this.$nextTick();
 
-		window.scrollTo({
-			top: 250,
+		const y = document.querySelector("#checkout").getBoundingClientRect().top + window.scrollY;
+
+		window.scroll({
+			top: y - 32,
 			behavior: "smooth",
 		});
 
