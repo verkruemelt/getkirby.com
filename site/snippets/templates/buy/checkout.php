@@ -64,27 +64,33 @@
 		</div>
 		<div class="checkout-form">
 			<div>
-				<div class="field">
-					<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
-					<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
-				</div>
-				<div class="checkout-country">
-					<div class="field flex-grow">
-						<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
-						<select id="country" name="country" required autocomplete="country" class="input" v-model="personalInfo.country" @change="changeCountry">
-							<?php foreach ($countries as $countryCode => $countryName): ?>
-							<option value="<?= $countryCode ?>"><?= $countryName ?></option>
-							<?php endforeach ?>
-						</select>
-					</div>
-					<div v-if="needsPostalCode" class="field" style="flex-basis: 7rem">
-						<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
-						<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
-					</div>
-				</div>
+				<fieldset class="checkout-fieldset checkout-identity">
+					<legend>Your details</legend>
+					<div class="fields">
+						<div class="field">
+							<label class="label" for="email">Email <abbr title="Required">*</abbr></label>
+							<input id="email" name="email" class="input" type="email" required v-model="personalInfo.email" placeholder="mail@example.com">
+						</div>
 
-				<fieldset class="checkout-company" v-if="locale.vatRate > 0">
-					<legend>Company</legend>
+						<div class="fieldgroup">
+							<div class="field">
+								<label class="label" for="country">Country <abbr title="Required">*</abbr></label>
+								<select id="country" name="country" required autocomplete="country" class="input" v-model="personalInfo.country" @change="changeCountry">
+									<?php foreach ($countries as $countryCode => $countryName): ?>
+									<option value="<?= $countryCode ?>"><?= $countryName ?></option>
+									<?php endforeach ?>
+								</select>
+							</div>
+							<div v-if="needsPostalCode" class="field">
+								<label class="label" for="postalCode">Postal Code <abbr title="Required">*</abbr></label>
+								<input id="postalCode" name="postalCode" class="input" autocomplete="postal-code" :required="needsPostalCode" v-model="personalInfo.postalCode" type="text">
+							</div>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset class="checkout-fieldset checkout-company" v-if="locale.vatRate > 0">
+					<legend>Your business</legend>
 					<div class="fields">
 						<div class="field">
 							<label class="label" for="vatId">VAT ID</label>
@@ -253,12 +259,15 @@ svg[data-type="loader"] {
 .checkout-preview th :where(input, select) {
 	background: var(--color-light);
 	height: 1.375rem;
-	line-height: 1.25;
+	line-height: 1.375rem;
 	padding-left: var(--spacing-1);
 	border-radius: var(--rounded);
 }
+.checkout-preview th :where(select) {
+	padding: 0 var(--spacing-2);
+}
 .checkout-preview th input {
-	width: 4rem;
+	width: 3.5rem;
 }
 .checkout-preview td {
 	text-align: right;
@@ -270,17 +279,6 @@ svg[data-type="loader"] {
 
 .checkout-preview tr.total td {
 	color: var(--color-purple-600);
-}
-
-.checkout-country {
-	display: flex;
-	align-items: center;
-	margin-top: var(--spacing-6);
-	margin-bottom: var(--spacing-6);
-	gap: var(--spacing-2);
-}
-.checkout-country .field {
-	margin-top: 0 !important;
 }
 
 .checkout .btn.btn--filled {
@@ -296,45 +294,72 @@ svg[data-type="loader"] {
 	color: var(--color-purple-900) !important;
 }
 
-.checkout-company {
-	margin-top: var(--spacing-6);
+.checkout-fieldset {
 	margin-bottom: var(--spacing-6);
 }
-.checkout-company legend {
+.checkout-fieldset legend {
 	font-weight: var(--font-bold);
 	margin-bottom: var(--spacing-2);
 }
-.checkout-company .fields {
+.checkout-fieldset .fields {
 	border: 1px solid var(--color-border);
 	border-radius: var(--rounded);
 	overflow: clip;
 }
-.checkout-company .field {
-	display: grid;
-	grid-template-columns: 6.75rem 1fr;
+.checkout-fieldset .field {
+	display: flex;
 	background: var(--color-white);
 	align-items: center;
 }
-.checkout-company .field + .field {
+.checkout-fieldset .field + .field {
 	margin-top: 0;
 	border-top: 1px solid var(--color-border);
 }
-.checkout-company .label {
+
+.checkout-fieldset .label {
 	display: flex;
 	align-items: center;
 	height: 2.25rem;
+	flex-basis: 6.75rem;
+	flex-shrink: 0;
 	font-weight: var(--font-normal);
 	margin-bottom: 0;
 	white-space: nowrap;
-	background: var(--color-gray-100);
+	background: rgba(0,0,0, .03);
 	padding: var(--spacing-2);
-	border-right: 1px solid var(--color-border);
-	color: var(--color-gray-800);
 }
-.checkout-company .field .input {
+.checkout-fieldset .field .input {
 	box-shadow: none;
 	outline-offset: -2px;
+	width: 100%;
+	flex-grow: 1;
 }
+
+.checkout-fieldset .fieldgroup {
+	border-top: 1px solid var(--color-border);
+}
+
+@media screen and (min-width: 70rem) {
+	.checkout-fieldset .fieldgroup {
+		display: flex;
+		align-items: center;
+		border-top: 1px solid var(--color-border);
+	}
+	.checkout-fieldset .fieldgroup .field {
+		border-top: 0;
+	}
+	.checkout-fieldset .fieldgroup .field:first-child {
+		flex-grow: 1;
+	}
+	.checkout-fieldset .fieldgroup .field:nth-child(2) {
+		flex-basis: 14rem;
+		border-left: 1px solid var(--color-border);
+	}
+	.checkout-fieldset .fieldgroup .field:nth-child(2) .label {
+		flex-basis: 6rem;
+	}
+}
+
 
 .checkout button[type="reset"] {
 	position: absolute;

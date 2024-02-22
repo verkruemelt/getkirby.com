@@ -17,6 +17,7 @@ body:has(.dialog[open]) {
 
 .dialog-form {
 	position: relative;
+	accent-color: var(--color-blue-700);
 }
 
 .dialog-form .field+.field {
@@ -47,8 +48,11 @@ body:has(.dialog[open]) {
 	border-radius: var(--rounded-sm);
 	box-shadow: 0px 0px 0px 1px var(--color-border);
 }
+.dialog-form :where(input:not([type=checkbox], [type=radio]), select):focus {
+	outline: 2px solid var(--color-blue-700);
+}
 
-.dialog-form select.input {
+.dialog-form select {
 	appearance: none;
 	font-size: inherit;
 }
