@@ -376,7 +376,7 @@ createApp({
 	},
 
 	// dynamic props
-	checkoutIsOpen: true,
+	checkoutIsOpen: false,
 	isFetchingPrices: false,
 	isProcessing: false,
 	product: "basic",
