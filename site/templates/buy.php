@@ -273,6 +273,8 @@ createApp({
 	async changeCountry(event) {
 		this.locale               = await this.fetchPrices(this.personalInfo.country);
 		this.personalInfo.country = this.locale.country;
+
+		window.localStorage.setItem("country", this.locale.country);
 	},
 	closeCheckout() {
 		this.checkoutIsOpen = false;
@@ -305,7 +307,9 @@ createApp({
 		return await response.json();
 	},
 	async mounted() {
-		this.locale               = await this.fetchPrices();
+		const country = window.localStorage.getItem("country") ?? this.locale.country;
+
+		this.locale               = await this.fetchPrices(country);
 		this.personalInfo.country = this.locale.country;
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
