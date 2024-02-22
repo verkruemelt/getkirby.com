@@ -211,7 +211,6 @@ svg[data-type="loader"] {
 	grid-area: preview;
 	background: var(--color-white);
 }
-
 .checkout-form {
 	grid-area: form;
 	padding: var(--spacing-8);
@@ -220,7 +219,6 @@ svg[data-type="loader"] {
 	justify-content: space-between;
 	background: rgba(255,255,255, .25);
 }
-
 .checkout .help {
 	font-size: var(--text-xs);
 	padding-top: var(--spacing-1);

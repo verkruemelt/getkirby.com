@@ -361,7 +361,7 @@ createApp({
 		vatRate: 0,
 	},
 
-	// persistent user-generated props
+	// user-generated props
 	personalInfo: {
 		city: "",
 		company: "",
@@ -441,9 +441,6 @@ createApp({
 			return formatter.format(amount);
 		}
 	},
-	cachePersonalInfo() {
-		window.localStorage.setItem("buy.personalInfo", JSON.stringify(this.personalInfo));
-	},
 	async changeCountry(event) {
 		this.locale               = await this.fetchPrices(this.personalInfo.country);
 		this.personalInfo.country = this.locale.country;
@@ -479,13 +476,7 @@ createApp({
 		return await response.json();
 	},
 	async mounted() {
-		// load the personal info from the last purchase if available
-		const personalInfo = window.localStorage.getItem("buy.personalInfo");
-		if (personalInfo) {
-			this.personalInfo = JSON.parse(personalInfo);
-		}
-
-		this.locale               = await this.fetchPrices(this.personalInfo.country);
+		this.locale               = await this.fetchPrices();
 		this.personalInfo.country = this.locale.country;
 
 		document.querySelector("article[data-loading]").removeAttribute("data-loading");
@@ -520,7 +511,6 @@ createApp({
 	},
 	submit() {
 		this.isProcessing = true;
-		this.cachePersonalInfo();
 	}
 }).mount();
 </script>
