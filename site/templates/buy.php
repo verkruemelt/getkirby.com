@@ -108,7 +108,7 @@ article[data-loading] .price[data-sale] {
 <article v-scope data-loading @mounted="mounted">
 	<div class="mb-42" v-cloak v-if="checkoutIsOpen">
 		<?php snippet('templates/buy/checkout') ?>
-		<p class="text-xs text-center mb-6 color-gray-700 pt-6">With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
+		<p class="text-xs text-center mb-6 color-gray-700 pt-6">Final VAT calculation is performed at checkout. With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
 	</div>
 
 	<div v-else>
