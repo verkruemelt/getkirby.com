@@ -1,6 +1,10 @@
 <?php layout() ?>
 
 <style>
+article[data-loading] .price[data-sale] {
+	color: var(--color-gray-600)
+}
+
 .checklist {
 	font-size: var(--text-sm);
 }
@@ -82,34 +86,13 @@
 	font-size: var(--text-xl);
 }
 
-article[data-loading] .price[data-sale] {
-	color: var(--color-gray-600)
-}
-
-@media (max-width: 40rem) {
-	.causes li:not(:first-child) {
-		display: none;
-	}
-}
-
-.volume-toggles {
-	display: flex;
-	align-items: center;
-	gap: 1.5rem;
-}
-.volume-toggles label {
-	display: flex;
-	align-items: center;
-	gap: .5rem;
-	cursor: pointer;
+[v-cloak] {
+	display: none;
 }
 </style>
 
 <article v-scope data-loading @mounted="mounted">
-	<div class="mb-42" v-cloak v-if="checkoutIsOpen">
-		<?php snippet('templates/buy/checkout') ?>
-		<p class="text-xs text-center mb-6 color-gray-700 pt-6">Final VAT calculation is performed at checkout. With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
-	</div>
+	<?php snippet('templates/buy/checkout') ?>
 
 	<div v-else>
 		<div class="columns mb-42" style="--columns-sm: 1; --columns-md: 1; --columns-lg: 2; --gap: var(--spacing-6)">
@@ -124,180 +107,28 @@ article[data-loading] .price[data-sale] {
 					</div>
 				<?php endif ?>
 			</div>
-
 			<div class="columns" style="--columns: 2; --gap: var(--spacing-6)">
-				<div class="pricing p-6 bg-white shadow-xl rounded flex flex-column justify-between">
-					<header>
-						<h2>
-							<?= $basic->label() ?>
-
-							<?php if ($sale->isActive()): ?>
-							<span class="price px-1" data-regular>
-								<span v-text="locale.currency">€</span>
-								<span class="amount" v-text="amountDisplay(locale.prices.basic.regular)"><?= $basic->price('EUR')->regular() ?></span>
-							</span>
-							<?php endif ?>
-						</h2>
-
-						<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="h2 block mb-3">
-							<span class="price" data-sale>
-								<span class="currency-sign" v-text="locale.currency.trim()">€</span>
-								<span class="amount" v-text="amountDisplay(locale.prices.basic.sale)"><?= $basic->price('EUR')->sale() ?></span>
-							</span>
-							per site
-						</a>
-
-						<p class="text-sm color-gray-700">A discounted license for individuals, small teams and side projects</p>
-					</header>
-
-					<details class="revenue">
-						<summary><span>Revenue limit: <strong><?= $revenueLimitShort ?> / year</strong></span> <?= icon('info') ?></summary>
-						<div>
-							<p>Your revenue or funding is less than <strong><?= $revenueLimitVerbose ?><span v-if="locale.revenueLimit.length" v-text="locale.revenueLimit"></span></strong> in the <strong>last 12 months</strong>.</p>
-							<p>If you build a website for a client, the limit has to fit the revenue of your client.</p>
-						</div>
-					</details>
-
-					<?php snippet('templates/buy/checklist') ?>
-
-					<footer>
-						<p>
-							<a href="/buy/basic" @click.prevent="openCheckout('basic')" target="_blank" class="btn btn--filled mb-1 w-100%">
-								<?= icon('cart') ?>
-								Buy <?= $basic->label() ?>
-							</a>
-						</p>
-					</footer>
-				</div>
-
-				<div class="pricing p-6 bg-white shadow-xl rounded flex flex-column justify-between">
-					<header>
-						<h2>
-							<?= $enterprise->label() ?>
-
-							<?php if ($sale->isActive()): ?>
-							<span class="price px-1" data-regular>
-								<span v-text="locale.currency">€</span>
-								<span class="amount" v-text="amountDisplay(locale.prices.enterprise.regular)"><?= $enterprise->price('EUR')->regular() ?></span>
-							</span>
-							<?php endif ?>
-						</h2>
-
-						<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="h2 block mb-3">
-							<span class="price" data-sale>
-								<span class="currency-sign" v-text="locale.currency.trim()">€</span>
-								<span class="amount" v-text="amountDisplay(locale.prices.enterprise.sale)"><?= $enterprise->price('EUR')->sale() ?></span>
-							</span>
-							per site
-						</a>
-
-						<p class="text-sm color-gray-700">Suitable for larger companies and organizations</p>
-					</header>
-
-					<details class="revenue">
-						<summary><span>Revenue limit: <strong>No limit</strong></span> <?= icon('info') ?></summary>
-						<div>
-							This license does not have a revenue limit.
-						</div>
-					</details>
-
-					<?php snippet('templates/buy/checklist') ?>
-
-					<footer>
-						<p>
-							<a href="/buy/enterprise" @click.prevent="openCheckout('enterprise')" target="_blank" class="btn btn--filled mb-1 w-100%">
-								<?= icon('cart') ?>
-								Buy <?= $enterprise->label() ?>
-							</a>
-						</p>
-					</footer>
-				</div>
-				<p class="text-xs text-center mb-6 color-gray-700" style="--span: 2">Prices + VAT if applicable. With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a></p>
+				<?php snippet('templates/buy/product', [
+					'product'     => $basic,
+					'description' => 'A discounted license for individuals, small teams and side projects',
+					'limit'       => $revenueLimitShort . '/ year',
+				]) ?>
+				<?php snippet('templates/buy/product', [
+					'product'     => $enterprise,
+					'description' => 'Suitable for larger companies and organizations',
+					'limit'       => 'No limit'
+				]) ?>
+				<p class="text-xs text-center mb-6 color-gray-700" style="--span: 2">
+					Prices + VAT if applicable. With your purchase you agree to our <a class="underline" href="<?= url('license') ?>">License terms</a>
+				</p>
 			</div>
 		</div>
-
-		<section class="mb-42">
-			<form class="volume-discounts" method="POST" target="_blank" action="<?= url('buy/volume') ?>">
-				<header class="flex items-baseline justify-between mb-6">
-					<h2 class="h2">Volume discounts</h2>
-					<fieldset>
-						<legend class="sr-only">License Type</legend>
-						<div class="volume-toggles">
-							<label><input type="radio" name="product" value="<?= $basic->value() ?>" v-model="product" checked> <?= $basic->label() ?></label>
-							<label><input type="radio" name="product" value="<?= $enterprise->value() ?>" v-model="product"> <?= $enterprise->label() ?></label>
-						</div>
-					</fieldset>
-				</header>
-				<div class="columns rounded overflow-hidden" style="--columns-md: 3; --columns: 3; --gap: var(--spacing-3)">
-					<?php foreach ($discounts as $volume => $discount) : ?>
-						<div class="block p-12 bg-light rounded text-center" >
-							<article>
-								<h3 class="mb text-sm">
-									<?= $volume ?>+ licenses
-								</h3>
-								<div class="mb-6">
-									<p class="h2">
-										Save <?= $discount ?>%
-									</p>
-									<?php if ($sale->isActive()): ?>
-										<p class="sale text-sm">on top!</p>
-									<?php endif ?>
-								</div>
-
-								<button class="btn btn--filled mb-3" @click.prevent="openCheckout(product, <?= $volume ?>)" name="volume" value="<?= $volume ?>">
-									<?= icon('cart') ?> Buy now
-								</button>
-							</article>
-						</div>
-					<?php endforeach ?>
-				</div>
-			</form>
-		</section>
+		<?php snippet('templates/buy/volume-discounts') ?>
 	</div>
 
 	<section class="mb-42 columns columns--reverse" style="--columns: 2; --columns-md: 1; --gap: var(--spacing-36)">
-		<div>
-			<h2 class="h2 mb-6">For a good cause? <mark class="px-1 rounded">It’s free.</mark></h2>
-			<div class="prose mb-6">
-				<p>We care about a better society and the future of our planet. We offer free&nbsp;licenses for <strong>students, selected educational projects, social and environmental organizations, charities and non-profits</strong> with insufficient funding.</p>
-			</div>
-
-			<a class="btn btn--filled mb-12" href="mailto:support@getkirby.com">
-				<?= icon('heart') ?>
-				Contact us
-			</a>
-
-			<ul class="columns causes" style="--columns: 2; --gap: var(--spacing-12);">
-				<?php foreach (collection('causes')->shuffle()->limit(2) as $case) : ?>
-					<li>
-						<a href="<?= $case->link()->toUrl() ?>">
-							<figure>
-								<span class="block shadow-2xl mb-3" style="--aspect-ratio: 3/4">
-									<?= img($image = $case->image(), [
-										'alt' => 'Screenshot of the ' . $image->alt() . ' website',
-										'src' => [
-											'width' => 300
-										],
-										'srcset' => [
-											'1x' => 400,
-											'2x' => 800,
-										]
-									]) ?>
-								</span>
-								<figcaption class="text-sm">
-									<?= $case->title() ?>
-								</figcaption>
-							</figure>
-						</a>
-					</li>
-				<?php endforeach ?>
-			</ul>
-		</div>
-
-		<div>
-			<h2 class="h2 mb-6">Frequently asked questions</h2>
-			<?php snippet('faq') ?>
-		</div>
+		<?php snippet('templates/buy/good-cause') ?>
+		<?php snippet('templates/buy/faq') ?>
 	</section>
 
 	<footer class="h2">
@@ -319,9 +150,6 @@ document.addEventListener("click", (event) => {
 		}
 	}
 });
-
-// access the dialog
-const checkout = document.querySelector(".checkout");
 
 // countries which require a postal code
 const postalCodeCountries = [
@@ -376,6 +204,7 @@ createApp({
 	},
 
 	// dynamic props
+	checkoutIsActive: <?= get('checkout') === 'new' ? 'true' : 'false' ?>,
 	checkoutIsOpen: false,
 	isFetchingPrices: false,
 	isProcessing: false,
@@ -486,7 +315,13 @@ createApp({
 			this.isProcessing = false;
 		});
 	},
-	async openCheckout(product, quantity = 1) {
+	async openCheckout(product, quantity = 1, event) {
+		if (this.checkoutIsActive === false) {
+			return;
+		}
+
+		event?.preventDefault();
+
 		this.product = product;
 		this.quantity = quantity;
 		this.checkoutIsOpen = true;

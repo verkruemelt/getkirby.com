@@ -11,8 +11,8 @@ return [
 	],
 	'revenueLimit' => 1000000,
 	'sale' => [
-		'start'    => '2023-11-28',
-		'end'      => '2023-12-18',
+		'start'    => '2023-02-22',
+		'end'      => '2023-02-24',
 		'discount' => 20
 	],
 	'quantities' => [
@@ -25,8 +25,8 @@ return [
 		15 => 15
 	],
 	'donation' => [
-		'teamAmount'     => 1,
-		'customerAmount' => 1,
+		'teamAmount'     => 0,
+		'customerAmount' => 0,
 		'charity' => 'Amadeu Antonio Foundation',
 		'purpose' => 'for their work on reinforcing a democratic civil society',
 		'link'    => 'https://www.amadeu-antonio-stiftung.de/en/'
