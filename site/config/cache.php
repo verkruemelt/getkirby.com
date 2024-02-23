@@ -13,9 +13,11 @@ return [
 		'active' => true,
 		'type'   => 'file',
 		'ignore' => [
+			'buy',
 			'love',
 			'partners',
-			'themes'
+			'themes',
+			'features-for-clients'
 		]
 	],
 	'plugins' => [
