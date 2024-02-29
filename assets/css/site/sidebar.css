@@ -41,3 +41,25 @@
 	margin: var(--spacing-3) 0;
 	border-top: 2px solid var(--color-gray-200);
 }
+
+/** Grouped Menu **/
+.sidebar .sidebar-group > h2 {
+	font-weight: var(--font-bold);
+	font-size: var(--text-sm);
+}
+.sidebar .sidebar-group ul a {
+	font-weight: var(--font-normal);
+	font-size: var(--text-sm);
+}
+
+.sidebar .sidebar-group li {
+	margin-bottom: 0rem;
+}
+
+.sidebar .sidebar-group .sidebar-menu-2 li>a {
+	font-size: var(--text-xs);
+}
+.sidebar .sidebar-group .sidebar-menu-2 {
+	padding-top: .25rem;
+	padding-bottom: .25rem;
+}

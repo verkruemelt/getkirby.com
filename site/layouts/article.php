@@ -24,6 +24,11 @@
 							<?php endif ?>
 						</header>
 					<?php endif ?>
+					<?php if ($screencast = $slots->screencast()): ?>
+						<?= $screencast ?>
+					<?php else: ?>
+						<?php snippet('screencast') ?>
+					<?php endif ?>
 
 					<?php if ($toc = $slots->toc()): ?>
 						<?= $toc ?>
@@ -35,6 +40,10 @@
 						<?= $slot ?? $page->text()->kt() ?>
 					</div>
 
+					<?php if ($prevnext = $slots->prevnext()): ?>
+						<?= $prevnext ?>
+					<?php endif ?>
+
 					<?php if ($footer = $slots->footer()): ?>
 						<?= $footer ?>
 					<?php else: ?>
@@ -42,6 +51,7 @@
 							<?php snippet('layouts/github-edit') ?>
 						</footer>
 					<?php endif ?>
+
 				</article>
 
 				<?php if ($sidebar = $slots->sidebar()): ?>
